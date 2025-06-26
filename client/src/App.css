@@ -1,0 +1,27 @@
+/* Reset max-width, padding, and centering from Vite default */
+#root {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+main {
+  min-height: 80vh;
+}
+
+/* District marker styles for the Sri Lanka Map */
+.district-marker {
+  width: 15px;
+  height: 15px;
+  background-color: #ff9800;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.district-marker:hover {
+  transform: scale(1.5);
+}
