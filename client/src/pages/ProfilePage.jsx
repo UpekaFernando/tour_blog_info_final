@@ -36,7 +36,7 @@ import { AuthContext } from '../context/AuthContext';
 import { getUserProfile, updateUserProfile, getDestinations, deleteDestination } from '../utils/api';
 
 const ProfilePage = () => {
-  const { currentUser, login, isAuthenticated } = useContext(AuthContext);
+  const { currentUser, login, updateUser, isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [userDestinations, setUserDestinations] = useState([]);
@@ -136,24 +136,35 @@ const ProfilePage = () => {
         formDataToSend.append('profilePicture', profilePicture);
       }
       
+      console.log('Updating profile with data:', Array.from(formDataToSend.entries()));
       const updatedUser = await updateUserProfile(formDataToSend, currentUser.token);
+      console.log('Received updated user data:', updatedUser);
       
-      // Update context with new user data
-      login({
+      // Update context with new user data, preserving the token
+      updateUser({
         ...updatedUser,
         token: currentUser.token,
       });
       
-      setSuccess('Profile updated successfully');
-      setEditing(false);
-      setLoading(false);
+      // Update local profile state with new data
+      setProfile(updatedUser);
       
-      // Reset password fields
-      setFormData({
-        ...formData,
-        password: '',
-        confirmPassword: '',
-      });    } catch (err) {
+      // Force a small delay to ensure state updates properly
+      setTimeout(() => {
+        // Reset file input
+        setProfilePicture(null);
+        
+        setSuccess('Profile updated successfully');
+        setEditing(false);
+        setLoading(false);
+        
+        // Reset password fields
+        setFormData({
+          ...formData,
+          password: '',
+          confirmPassword: '',
+        });
+      }, 100);    } catch (err) {
       setError(err.response?.data?.message || 'Failed to update profile');
       setLoading(false);
     }
@@ -225,7 +236,13 @@ const ProfilePage = () => {
                 profilePicture
                   ? URL.createObjectURL(profilePicture)
                   : profile?.profilePicture
-                  ? `http://localhost:5000${profile.profilePicture}`
+                  ? (() => {
+                      const imageUrl = profile.profilePicture.startsWith('/uploads') 
+                        ? `http://localhost:5000${profile.profilePicture}?t=${Date.now()}`
+                        : `http://localhost:5000/uploads/${profile.profilePicture}?t=${Date.now()}`;
+                      console.log('Profile image URL:', imageUrl);
+                      return imageUrl;
+                    })()
                   : undefined
               }
               sx={{ width: 120, height: 120, mb: 2 }}

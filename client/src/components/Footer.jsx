@@ -5,6 +5,17 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 import { Link as RouterLink } from 'react-router-dom';
 
 const Footer = () => {
+  // Example: fetch destinations and users (replace with real data fetching in production)
+  const exampleDestinations = [
+    { title: 'Kandy', image: '/uploads/images-1750785265516.jpg' },
+    { title: 'Galle', image: '/uploads/images-1750785364426.jpg' },
+    { title: 'Jaffna', image: '/uploads/images-1750785584274.png' }
+  ];
+  const exampleUsers = [
+    { name: 'Upeka', profilePicture: '/uploads/images-1755800929685.jpg' },
+    { name: 'Fernando', profilePicture: '/uploads/images-1755800929690.jpg' }
+  ];
+
   return (
     <Box
       sx={{
@@ -14,18 +25,30 @@ const Footer = () => {
         mt: 'auto'
       }}
       component="footer"
-    >      <Container maxWidth="lg">
+    >
+      <Container maxWidth="lg">
         <Grid container spacing={4}>
-          <Grid size={{ xs: 12, sm: 4 }}>
+          <Grid item xs={12} sm={4}>
             <Typography variant="h6" gutterBottom>
               Sri Lanka Travel Blog
             </Typography>
             <Typography variant="body2">
-              Discover the beauty and culture of Sri Lanka through our interactive travel blog.              Explore different districts, find hidden gems, and share your own experiences.
+              Discover the beauty and culture of Sri Lanka through our interactive travel blog. Explore different districts, find hidden gems, and share your own experiences.
             </Typography>
+            {/* Destination Images */}
+            <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+              {exampleDestinations.map((dest, idx) => (
+                <Box key={idx} sx={{ width: 60, height: 40, overflow: 'hidden', borderRadius: 2, bgcolor: 'grey.300' }}>
+                  <img
+                    src={`http://localhost:5000${dest.image}`}
+                    alt={dest.title}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </Box>
+              ))}
+            </Box>
           </Grid>
-          
-          <Grid size={{ xs: 12, sm: 4 }}>
+          <Grid item xs={12} sm={4}>
             <Typography variant="h6" gutterBottom>
               Quick Links
             </Typography>
@@ -38,10 +61,22 @@ const Footer = () => {
               </Link>
               <Link component={RouterLink} to="/register" color="inherit" sx={{ display: 'block', mb: 1 }}>
                 Join Us
-              </Link>            </Typography>
+              </Link>
+            </Typography>
+            {/* User Profile Images */}
+            <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+              {exampleUsers.map((user, idx) => (
+                <Box key={idx} sx={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', bgcolor: 'grey.300' }}>
+                  <img
+                    src={`http://localhost:5000${user.profilePicture}`}
+                    alt={user.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </Box>
+              ))}
+            </Box>
           </Grid>
-          
-          <Grid size={{ xs: 12, sm: 4 }}>
+          <Grid item xs={12} sm={4}>
             <Typography variant="h6" gutterBottom>
               Connect With Us
             </Typography>
@@ -61,7 +96,6 @@ const Footer = () => {
             </Typography>
           </Grid>
         </Grid>
-        
         <Box sx={{ mt: 5, textAlign: 'center' }}>
           <Typography variant="body2">
             &copy; {new Date().getFullYear()} Sri Lanka Travel Blog. All rights reserved.

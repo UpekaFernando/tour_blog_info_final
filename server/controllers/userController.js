@@ -105,37 +105,61 @@ const getUserProfile = async (req, res) => {
 // @access  Private
 const updateUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    console.log('=== Updating User Profile ===');
+    console.log('User ID:', req.user.id);
+    console.log('Body:', req.body);
+    console.log('File:', req.file);
+
+    const user = await User.findByPk(req.user.id);
 
     if (user) {
-      user.name = req.body.name || user.name;
-      user.email = req.body.email || user.email;
-      
+      // Update basic fields
+      const updateData = {
+        name: req.body.name || user.name,
+        email: req.body.email || user.email,
+      };
+
+      // Update password if provided
       if (req.body.password) {
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(req.body.password, salt);
+        updateData.password = req.body.password; // Will be hashed by the User model hook
       }
 
+      // Update profile picture if file was uploaded
       if (req.file) {
-        user.profilePicture = `/${req.file.path}`;
+        updateData.profilePicture = `/uploads/${req.file.filename}`;
+        console.log('New profile picture path:', updateData.profilePicture);
       }
 
-      const updatedUser = await user.save();
+      // Update user in database
+      await user.update(updateData);
 
+      // Fetch the updated user data to ensure we return the latest info
+      const updatedUser = await User.findByPk(user.id, {
+        attributes: { exclude: ['password'] }
+      });
+
+      console.log('Updated user data:', {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        profilePicture: updatedUser.profilePicture
+      });
+
+      // Return updated user data
       res.json({
-        _id: updatedUser._id,
+        _id: updatedUser.id,
+        id: updatedUser.id,
         name: updatedUser.name,
         email: updatedUser.email,
         isAdmin: updatedUser.isAdmin,
         profilePicture: updatedUser.profilePicture,
-        token: generateToken(updatedUser._id),
       });
     } else {
       res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error updating user profile:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 

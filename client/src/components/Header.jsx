@@ -58,6 +58,11 @@ const Header = () => {
 
   const menuItems = [
     { text: 'Home', path: '/' },
+    { text: 'Explore', path: '/explore' },
+    { text: 'Travel Guide', path: '/travel-guide' },
+    { text: 'Gallery', path: '/gallery' },
+    { text: 'Services', path: '/services' },
+    { text: 'Weather', path: '/weather' },
     { text: 'About', path: '/about' }
   ];
 
@@ -145,7 +150,7 @@ const Header = () => {
                   {currentUser?.profilePicture ? (
                     <Avatar 
                       alt={currentUser.name} 
-                      src={`http://localhost:5000${currentUser.profilePicture}`}
+                      src={`http://localhost:5000${currentUser.profilePicture}?t=${Date.now()}`}
                       sx={{ width: 32, height: 32 }}
                     />
                   ) : (

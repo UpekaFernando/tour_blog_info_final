@@ -39,6 +39,14 @@ User.beforeCreate(async (user) => {
   }
 });
 
+// Hook to hash password before updating
+User.beforeUpdate(async (user) => {
+  if (user.changed('password')) {
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
+  }
+});
+
 // Method to check if password matches
 User.prototype.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);

@@ -33,6 +33,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
   };
 
+  // Update user data without changing authentication status
+  const updateUser = (userData) => {
+    const updatedUser = { ...currentUser, ...userData };
+    setCurrentUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -40,7 +47,8 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         loading,
         login,
-        logout
+        logout,
+        updateUser
       }}
     >
       {children}

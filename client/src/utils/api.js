@@ -32,7 +32,20 @@ export const getUserProfile = async (token) => {
 };
 
 export const updateUserProfile = async (userData, token) => {
-  const response = await createAPIClient(token).put('/users/profile', userData);
+  // Check if userData is FormData (for file uploads like profile pictures)
+  const isFormData = userData instanceof FormData;
+  
+  // Create API client with appropriate headers
+  const apiClient = axios.create({
+    baseURL: API_URL,
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+      // Don't set Content-Type for FormData - let browser set it automatically
+      ...(!isFormData && { 'Content-Type': 'application/json' })
+    }
+  });
+  
+  const response = await apiClient.put('/users/profile', userData);
   return response.data;
 };
 
@@ -77,17 +90,53 @@ export const getDestinations = async (districtId = null) => {
     return response.data;
   } catch (error) {
     console.log('Using mock destination data');
-    // Mock data for demo
+    // Mock data for demo (using local uploaded images)
     const mockDestinations = [
-      { _id: '101', name: 'Sigiriya Rock Fortress', district: '2', description: 'Ancient rock fortress with frescoes and gardens', imageUrl: 'https://images.unsplash.com/photo-1588258147256-f4033aaef97c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80' },
-      { _id: '102', name: 'Galle Fort', district: '3', description: 'Historic fortified city built by the Portuguese', imageUrl: 'https://images.unsplash.com/photo-1580674285054-bed31e145f59?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80' },
-      { _id: '103', name: 'Dambulla Cave Temple', district: '2', description: 'A sacred pilgrimage site for 22 centuries', imageUrl: 'https://images.unsplash.com/photo-1568632234157-ce7aecd03d0a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80' },
-      { _id: '104', name: 'Colombo National Museum', district: '1', description: 'The largest museum in Sri Lanka', imageUrl: 'https://images.unsplash.com/photo-1572953109213-3be62398eb95?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80' },
-      { _id: '105', name: 'Pigeon Island', district: '5', description: 'Marine national park with amazing snorkeling', imageUrl: 'https://images.unsplash.com/photo-1527525443983-6e60c75fff46?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80' },
-      { _id: '106', name: 'Jaffna Fort', district: '4', description: 'Portuguese fort later occupied by the Dutch', imageUrl: 'https://images.unsplash.com/photo-1562939684-6a43f1e0504b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80' }
+      {
+        _id: '101',
+        title: 'Sigiriya Rock Fortress',
+        district: '2',
+        description: 'Ancient rock fortress with frescoes and gardens',
+        images: ['/uploads/images-1750785265516.jpg']
+      },
+      {
+        _id: '102',
+        title: 'Galle Fort',
+        district: '3',
+        description: 'Historic fortified city built by the Portuguese',
+        images: ['/uploads/images-1750785364426.jpg']
+      },
+      {
+        _id: '103',
+        title: 'Dambulla Cave Temple',
+        district: '2',
+        description: 'A sacred pilgrimage site for 22 centuries',
+        images: ['/uploads/images-1750785584274.png']
+      },
+      {
+        _id: '104',
+        title: 'Colombo National Museum',
+        district: '1',
+        description: 'The largest museum in Sri Lanka',
+        images: ['/uploads/images-1755800929685.jpg']
+      },
+      {
+        _id: '105',
+        title: 'Pigeon Island',
+        district: '5',
+        description: 'Marine national park with amazing snorkeling',
+        images: ['/uploads/images-1755800929690.jpg']
+      },
+      {
+        _id: '106',
+        title: 'Jaffna Fort',
+        district: '4',
+        description: 'Portuguese fort later occupied by the Dutch',
+        images: ['/uploads/images-1750785265516.jpg']
+      }
     ];
 
-    return districtId 
+    return districtId
       ? mockDestinations.filter(dest => dest.district === districtId)
       : mockDestinations;
   }

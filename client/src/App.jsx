@@ -15,6 +15,12 @@ import AddDestinationPage from './pages/AddDestinationPage';
 import EditDestinationPage from './pages/EditDestinationPage';
 import AboutPage from './pages/AboutPage';
 import NotFoundPage from './pages/NotFoundPage';
+import ExplorePage from './pages/ExplorePage';
+import TravelGuidePage from './pages/TravelGuidePage';
+import PhotoGalleryPage from './pages/PhotoGalleryPage';
+import LocalServicesPage from './pages/LocalServicesPage';
+import WeatherClimatePage from './pages/WeatherClimatePage';
+import AllDestinationsPage from './pages/AllDestinationsPage';
 
 // Import Components
 import Header from './components/Header';
@@ -102,6 +108,11 @@ function App() {
           <main>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/travel-guide" element={<TravelGuidePage />} />
+              <Route path="/gallery" element={<PhotoGalleryPage />} />
+              <Route path="/services" element={<LocalServicesPage />} />
+              <Route path="/weather" element={<WeatherClimatePage />} />
               <Route path="/district/:id" element={<DistrictPage />} />
               <Route path="/destination/:id" element={<DestinationPage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -111,6 +122,7 @@ function App() {
               <Route path="/edit-destination/:id" element={<EditDestinationPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/404" element={<NotFoundPage />} />
+              <Route path="/destinations" element={<AllDestinationsPage />} />
               <Route path="*" element={<Navigate to="/404" replace />} />
             </Routes>
           </main>

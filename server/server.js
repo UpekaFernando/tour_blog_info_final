@@ -26,6 +26,21 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'API is working!' });
 });
 
+// Test image serving
+app.get('/api/test-image', (req, res) => {
+  const fs = require('fs');
+  const imagePath = path.join(__dirname, 'uploads', 'profilePicture-1756319966564.jpeg');
+  
+  console.log('Testing image path:', imagePath);
+  console.log('Image exists:', fs.existsSync(imagePath));
+  
+  res.json({ 
+    imagePath,
+    exists: fs.existsSync(imagePath),
+    staticUrl: '/uploads/profilePicture-1756319966564.jpeg'
+  });
+});
+
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/destinations', destinationRoutes);

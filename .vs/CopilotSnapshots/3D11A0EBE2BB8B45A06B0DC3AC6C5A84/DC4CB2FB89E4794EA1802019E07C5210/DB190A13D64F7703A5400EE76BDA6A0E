@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -22,17 +22,9 @@ const DestinationCard = ({ destination }) => {
   };
 
   // Get the first image or use a default one
-  let imageUrl = 'https://via.placeholder.com/400x250?text=No+Image+Available';
-  
-  if (destination.images && destination.images.length > 0) {
-    // Check if image path already contains the full URL
-    if (destination.images[0].startsWith('http')) {
-      imageUrl = destination.images[0];
-    } else {
-      // Add the base URL to the image path from server
-      imageUrl = `http://localhost:5000${destination.images[0]}`;
-    }
-  }
+  const imageUrl = destination.images && destination.images.length > 0
+    ? `http://localhost:5000${destination.images[0]}`
+    : 'https://via.placeholder.com/400x250?text=No+Image+Available';
 
   return (
     <Card sx={{ 
@@ -45,14 +37,13 @@ const DestinationCard = ({ destination }) => {
         transform: 'scale(1.02)'
       }
     }}>
-      <CardActionArea onClick={() => navigate(`/destination/${destination.id || destination._id}`)}>
+      <CardActionArea onClick={() => navigate(`/destination/${destination._id}`)}>
         <CardMedia
           component="img"
           height="180"
           image={imgError ? 'https://via.placeholder.com/400x250?text=No+Image+Available' : imageUrl}
           alt={destination.title}
           onError={handleImageError}
-          sx={{ objectFit: 'cover' }}
         />
         <CardContent sx={{ flexGrow: 1 }}>
           <Typography gutterBottom variant="h5" component="div" noWrap>
@@ -62,7 +53,7 @@ const DestinationCard = ({ destination }) => {
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <LocationOn fontSize="small" sx={{ mr: 0.5, color: 'primary.main' }} />
             <Typography variant="body2" color="text.secondary">
-              {destination.district?.name || destination.District?.name || 'Unknown District'}
+              {destination.district?.name || 'Unknown District'}
             </Typography>
           </Box>
           
@@ -89,7 +80,7 @@ const DestinationCard = ({ destination }) => {
         <Button 
           size="small" 
           color="primary" 
-          onClick={() => navigate(`/destination/${destination.id || destination._id}`)}
+          onClick={() => navigate(`/destination/${destination._id}`)}
         >
           Learn More
         </Button>

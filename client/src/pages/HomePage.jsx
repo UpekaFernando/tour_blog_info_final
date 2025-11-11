@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Typography, Box, Grid, Paper, Button, CircularProgress } from '@mui/material';
 import { Explore } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import SriLankaMap from '../components/SriLankaMap';
 import DestinationCard from '../components/DestinationCard';
 import { getDestinations } from '../utils/api';
@@ -171,6 +171,111 @@ const HomePage = () => {
           </Grid>
         </Grid>
       </Container>
+
+      {/* Quick Links Section */}
+      <Box sx={{ bgcolor: 'primary.main', color: 'white', py: 8 }}>
+        <Container maxWidth="lg">
+          <Typography variant="h4" component="h2" align="center" gutterBottom>
+            Plan Your Perfect Trip
+          </Typography>
+          <Typography variant="body1" align="center" paragraph sx={{ mb: 6 }}>
+            Everything you need to explore Sri Lanka
+          </Typography>
+          
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper 
+                sx={{ 
+                  p: 3, 
+                  textAlign: 'center', 
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s',
+                  '&:hover': { transform: 'translateY(-4px)' }
+                }}
+                onClick={() => navigate('/explore')}
+              >
+                <Explore sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                  Explore Destinations
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Discover amazing places with advanced search and filters
+                </Typography>
+              </Paper>
+            </Grid>
+            
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper 
+                sx={{ 
+                  p: 3, 
+                  textAlign: 'center', 
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s',
+                  '&:hover': { transform: 'translateY(-4px)' }
+                }}
+                onClick={() => navigate('/travel-guide')}
+              >
+                <Box sx={{ fontSize: 48, color: 'secondary.main', mb: 2 }}>📖</Box>
+                <Typography variant="h6" gutterBottom>
+                  Travel Guide
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Essential tips, transportation, budget guides, and cultural insights
+                </Typography>
+              </Paper>
+            </Grid>
+            
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper 
+                sx={{ 
+                  p: 3, 
+                  textAlign: 'center', 
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s',
+                  '&:hover': { transform: 'translateY(-4px)' }
+                }}
+                onClick={() => navigate('/weather')}
+              >
+                <Box sx={{ fontSize: 48, color: 'warning.main', mb: 2 }}>☀️</Box>
+                <Typography variant="h6" gutterBottom>
+                  Weather & Climate
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Plan with detailed weather information for all regions
+                </Typography>
+              </Paper>
+            </Grid>
+            
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper 
+                sx={{ 
+                  p: 3, 
+                  textAlign: 'center', 
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s',
+                  '&:hover': { transform: 'translateY(-4px)' }
+                }}
+                onClick={() => navigate('/gallery')}
+              >
+                <Box sx={{ fontSize: 48, color: 'success.main', mb: 2 }}>📸</Box>
+                <Typography variant="h6" gutterBottom>
+                  Photo Gallery
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Browse stunning photos and share your own memories
+                </Typography>
+              </Paper>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* View All Destinations Button */}
+      <Box sx={{ textAlign: 'center', mt: 4 }}>
+        <Link to="/destinations">
+          <Button variant="contained" color="primary">View All Destinations</Button>
+        </Link>
+      </Box>
     </>
   );
 };
