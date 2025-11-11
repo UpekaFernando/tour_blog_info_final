@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Create API client with Authentication
 const createAPIClient = (token = null) => {
@@ -15,39 +16,76 @@ const createAPIClient = (token = null) => {
   return apiClient;
 };
 
-// User API calls
-export const registerUser = async (userData) => {
-  const response = await createAPIClient().post('/users', userData);
-  return response.data;
-};
+class ApiService {
+  static async request(endpoint, options = {}) {
+    const url = `${API_BASE_URL}${endpoint}`;
+    
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    };
 
-export const loginUser = async (credentials) => {
-  const response = await createAPIClient().post('/users/login', credentials);
-  return response.data;
-};
-
-export const getUserProfile = async (token) => {
-  const response = await createAPIClient(token).get('/users/profile');
-  return response.data;
-};
-
-export const updateUserProfile = async (userData, token) => {
-  // Check if userData is FormData (for file uploads like profile pictures)
-  const isFormData = userData instanceof FormData;
-  
-  // Create API client with appropriate headers
-  const apiClient = axios.create({
-    baseURL: API_URL,
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-      // Don't set Content-Type for FormData - let browser set it automatically
-      ...(!isFormData && { 'Content-Type': 'application/json' })
+    try {
+      console.log(`🔄 API Request: ${config.method || 'GET'} ${url}`);
+      const response = await fetch(url, config);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ API Response:', data);
+      return data;
+    } catch (error) {
+      console.error('❌ API request failed:', error);
+      throw error;
     }
-  });
-  
-  const response = await apiClient.put('/users/profile', userData);
-  return response.data;
-};
+  }
+
+  static async get(endpoint) {
+    return this.request(endpoint);
+  }
+
+  static async post(endpoint, data) {
+    return this.request(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async testConnection() {
+    try {
+      console.log('🔄 Testing backend connection...');
+      const response = await this.get('/test');
+      console.log('✅ Backend connection successful:', response);
+      return response;
+    } catch (error) {
+      console.error('❌ Backend connection failed:', error.message);
+      throw error;
+    }
+  }
+
+  static async testDatabase() {
+    try {
+      const response = await this.testConnection();
+      if (response.database === 'Connected') {
+        console.log('✅ Database connection verified from frontend');
+        return true;
+      } else {
+        console.warn('⚠️ Database not connected:', response.error);
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ Database test failed:', error);
+      return false;
+    }
+  }
+}
+
+export default ApiService;
 
 // District API calls
 export const getDistricts = async () => {
@@ -168,14 +206,20 @@ export const createDestination = async (destinationData, token) => {
 };
 
 export const updateDestination = async (id, destinationData, token) => {
-  const apiClient = createAPIClient(token);
-  
-  // If destinationData is FormData (contains files), don't set Content-Type
+  // If destinationData is FormData (contains files), create client without Content-Type header
   if (destinationData instanceof FormData) {
+    const apiClient = axios.create({
+      baseURL: API_URL,
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` })
+        // Don't set Content-Type for FormData - let browser set it with boundary
+      }
+    });
     const response = await apiClient.put(`/destinations/${id}`, destinationData);
     return response.data;
   } else {
     // Regular JSON data
+    const apiClient = createAPIClient(token);
     const response = await apiClient.put(`/destinations/${id}`, destinationData);
     return response.data;
   }
@@ -193,4 +237,25 @@ export const uploadImage = (formData, token) => {
       'Content-Type': 'multipart/form-data'
     }
   });
+};
+
+// User API functions
+export const registerUser = async (userData) => {
+  const response = await createAPIClient().post('/users', userData);
+  return response.data;
+};
+
+export const loginUser = async (credentials) => {
+  const response = await createAPIClient().post('/users/login', credentials);
+  return response.data;
+};
+
+export const getUserProfile = async (token) => {
+  const response = await createAPIClient(token).get('/users/profile');
+  return response.data;
+};
+
+export const updateUserProfile = async (userData, token) => {
+  const response = await createAPIClient(token).put('/users/profile', userData);
+  return response.data;
 };

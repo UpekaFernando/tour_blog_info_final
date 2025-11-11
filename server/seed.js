@@ -75,20 +75,12 @@ const seedDatabase = async () => {
     await sequelize.sync({ force: true });
     console.log('Database synced');
     
-    // Create admin user
-    const hashedPassword = await bcrypt.hash(adminUser.password, 10);
-    const admin = await User.create({
-      ...adminUser,
-      password: hashedPassword
-    });
+    // Create admin user (password will be hashed by User model hook)
+    const admin = await User.create(adminUser);
     console.log('Admin user created');
     
-    // Create regular user
-    const regularUserPassword = await bcrypt.hash(regularUser.password, 10);
-    const user = await User.create({
-      ...regularUser,
-      password: regularUserPassword
-    });
+    // Create regular user (password will be hashed by User model hook)
+    const user = await User.create(regularUser);
     console.log('Regular user created');
     
     // Create districts

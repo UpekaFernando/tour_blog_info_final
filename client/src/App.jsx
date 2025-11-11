@@ -28,6 +28,7 @@ import Footer from './components/Footer';
 
 // Import Context
 import { AuthContext } from './context/AuthContext';
+import ApiService from './utils/api';
 
 // Create theme
 const theme = createTheme({
@@ -70,6 +71,7 @@ const theme = createTheme({
 const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState('checking');
   
   const login = (userData) => {
     setCurrentUser(userData);
@@ -89,10 +91,30 @@ const AuthProvider = ({ children }) => {
       setCurrentUser(JSON.parse(storedUser));
       setIsAuthenticated(true);
     }
+
+    // Test backend and database connection
+    const testConnections = async () => {
+      try {
+        console.log('🔄 Testing connections on app start...');
+        const dbConnected = await ApiService.testDatabase();
+        setConnectionStatus(dbConnected ? 'connected' : 'database-error');
+      } catch (error) {
+        console.error('❌ Connection test failed:', error);
+        setConnectionStatus('backend-error');
+      }
+    };
+    
+    testConnections();
   }, []);
   
   return (
-    <AuthContext.Provider value={{ currentUser, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ 
+      currentUser, 
+      isAuthenticated, 
+      login, 
+      logout, 
+      connectionStatus 
+    }}>
       {children}
     </AuthContext.Provider>
   );

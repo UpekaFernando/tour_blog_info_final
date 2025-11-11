@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Typography, Box, Grid, Paper, Button, CircularProgress } from '@mui/material';
 import { Explore } from '@mui/icons-material';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import SriLankaMap from '../components/SriLankaMap';
 import DestinationCard from '../components/DestinationCard';
 import { getDestinations } from '../utils/api';
@@ -62,7 +62,8 @@ const HomePage = () => {
             sx={{ 
               fontSize: { xs: '2.5rem', md: '4rem' },
               fontWeight: 'bold',
-              mb: 2
+              mb: 2,
+              textShadow: '2px 2px 6px rgba(0,0,0,0.7)'
             }}
           >
             Discover Sri Lanka
@@ -74,7 +75,8 @@ const HomePage = () => {
               mb: 4,
               maxWidth: '800px',
               mx: 'auto',
-              fontWeight: 300
+              fontWeight: 300,
+              textShadow: '2px 2px 6px rgba(0,0,0,0.7)'
             }}
           >
             Explore the pearl of the Indian Ocean with our interactive travel guide
@@ -127,7 +129,7 @@ const HomePage = () => {
               variant="outlined" 
               color="primary" 
               size="large"
-              onClick={() => navigate('/districts')}
+              onClick={() => navigate('/destinations')}
             >
               View All Destinations
             </Button>
@@ -268,13 +270,6 @@ const HomePage = () => {
             </Grid>
           </Grid>
         </Container>
-      </Box>
-
-      {/* View All Destinations Button */}
-      <Box sx={{ textAlign: 'center', mt: 4 }}>
-        <Link to="/destinations">
-          <Button variant="contained" color="primary">View All Destinations</Button>
-        </Link>
       </Box>
     </>
   );

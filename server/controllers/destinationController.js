@@ -130,6 +130,11 @@ const getDestinationById = async (req, res) => {
 // @access  Private
 const updateDestination = async (req, res) => {
   try {
+    console.log('=== UPDATE DESTINATION REQUEST ===');
+    console.log('Request body:', req.body);
+    console.log('Uploaded files:', req.files);
+    console.log('Number of files:', req.files ? req.files.length : 0);
+    
     const { title, description, districtId, location, bestTimeToVisit, travelTips, existingImages } = req.body;
     
     const destination = await Destination.findByPk(req.params.id, {
@@ -175,9 +180,12 @@ const updateDestination = async (req, res) => {
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map(file => `/uploads/${file.filename}`);
       images = [...images, ...newImages];
+      console.log('New images uploaded:', newImages);
     }
 
     console.log('Updating destination with images:', images);
+    console.log('req.files:', req.files);
+    console.log('existingImages from request:', existingImages);
 
     // Update destination
     await destination.update({

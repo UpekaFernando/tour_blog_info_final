@@ -123,8 +123,9 @@ const SriLankaMap = () => {
       </Box>
       
       <Typography variant="body2" textAlign="center" color="text.secondary" sx={{ mb: 4 }}>
-        Note: You'll need to add your Mapbox API token to use the interactive map feature.
+        
       </Typography>
+      
     </>
   );
 };
