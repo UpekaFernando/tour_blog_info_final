@@ -66,6 +66,25 @@ services:
     networks:
       - tourblog_network
 
+  # phpMyAdmin - Database Web Interface
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: tourblog_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - tourblog_network
+
 volumes:
   mysql_data:
     driver: local
