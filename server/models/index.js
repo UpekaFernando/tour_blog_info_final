@@ -3,6 +3,8 @@ const District = require('./District');
 const Destination = require('./Destination');
 const Comment = require('./Comment');
 const Rating = require('./Rating');
+const LocalService = require('./LocalService');
+const TravelGuide = require('./TravelGuide');
 
 // Define relationships
 // District - Destination relationship
@@ -63,10 +65,32 @@ Rating.belongsTo(Destination, {
   foreignKey: 'destinationId'
 });
 
+// User - LocalService relationship
+User.hasMany(LocalService, {
+  foreignKey: 'userId',
+  as: 'localServices'
+});
+LocalService.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user'
+});
+
+// User - TravelGuide relationship
+User.hasMany(TravelGuide, {
+  foreignKey: 'userId',
+  as: 'travelGuides'
+});
+TravelGuide.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'author'
+});
+
 module.exports = {
   User,
   District,
   Destination,
   Comment,
-  Rating
+  Rating,
+  LocalService,
+  TravelGuide
 };

@@ -1,443 +1,444 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import {
   Container,
   Typography,
   Box,
   Grid,
   Paper,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
   Card,
   CardContent,
-  CardMedia,
-  Divider,
-  Chip,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
+  IconButton,
+  Alert,
+  Snackbar,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  useTheme,
 } from '@mui/material';
 import {
-  Flight as FlightIcon,
-  Hotel as HotelIcon,
-  Restaurant as RestaurantIcon,
-  LocalTaxi as TaxiIcon,
-  Train as TrainIcon,
-  DirectionsBus as BusIcon,
-  LocalGasStation as GasIcon,
-  Phone as PhoneIcon,
-  Warning as WarningIcon,
-  Language as LanguageIcon,
-  AccountBalanceWallet as CurrencyIcon,
-  Schedule as ClockIcon,
-  Thermostat as WeatherIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Visibility as ViewIcon,
+  ThumbUp as HelpfulIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
+import { AuthContext } from '../context/AuthContext';
+import api from '../utils/api';
 
 const TravelGuidePage = () => {
-  const theme = useTheme();
-  const [selectedTab, setSelectedTab] = useState('planning');
+  const { user } = useContext(AuthContext);
+  const [guides, setGuides] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editingGuide, setEditingGuide] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  
+  const [formData, setFormData] = useState({
+    title: '',
+    category: 'planning',
+    content: '',
+    summary: '',
+    tags: '',
+  });
+  const [imageFile, setImageFile] = useState(null);
 
-  const emergencyNumbers = [
-    { service: 'Police Emergency', number: '119' },
-    { service: 'Fire & Rescue', number: '110' },
-    { service: 'Accident Service', number: '1990' },
-    { service: 'Tourist Hotline', number: '1912' },
+  const categories = [
+    { value: '', label: 'All Guides' },
+    { value: 'planning', label: 'Trip Planning' },
+    { value: 'transport', label: 'Transportation' },
+    { value: 'budget', label: 'Budget Tips' },
+    { value: 'cultural', label: 'Cultural Tips' },
+    { value: 'safety', label: 'Safety' },
+    { value: 'visa', label: 'Visa & Entry' },
+    { value: 'emergency', label: 'Emergency Info' },
+    { value: 'language', label: 'Language' },
+    { value: 'other', label: 'Other' },
   ];
 
-  const transportOptions = [
-    {
-      type: 'Train',
-      icon: <TrainIcon />,
-      description: 'Scenic railway journeys connecting major cities',
-      pros: ['Affordable', 'Scenic routes', 'Comfortable'],
-      cons: ['Limited schedules', 'Can be crowded'],
-      tips: 'Book first-class for longer journeys'
-    },
-    {
-      type: 'Bus',
-      icon: <BusIcon />,
-      description: 'Extensive network covering the entire island',
-      pros: ['Very cheap', 'Frequent services', 'Reaches remote areas'],
-      cons: ['Can be uncomfortable', 'Traffic delays'],
-      tips: 'Use air-conditioned buses for comfort'
-    },
-    {
-      type: 'Tuk-tuk',
-      icon: <TaxiIcon />,
-      description: 'Three-wheeled vehicles perfect for short distances',
-      pros: ['Convenient', 'Negotiable fares', 'Everywhere'],
-      cons: ['No meter', 'Weather dependent'],
-      tips: 'Always negotiate fare before starting'
-    },
-    {
-      type: 'Taxi/Car Rental',
-      icon: <GasIcon />,
-      description: 'Private transportation with driver or self-drive',
-      pros: ['Comfort', 'Flexible schedule', 'Door-to-door'],
-      cons: ['Expensive', 'Traffic in cities'],
-      tips: 'Hire with driver for better experience'
-    },
-  ];
+  useEffect(() => {
+    fetchGuides();
+  }, [selectedCategory]);
 
-  const budgetGuide = [
-    {
-      category: 'Budget Traveler',
-      range: '$20-40/day',
-      accommodation: 'Hostels, guesthouses ($5-15/night)',
-      food: 'Local restaurants, street food ($3-8/meal)',
-      transport: 'Public buses, trains ($1-5/journey)',
-      activities: 'Free attractions, hiking ($0-10/activity)'
-    },
-    {
-      category: 'Mid-range Traveler',
-      range: '$40-80/day',
-      accommodation: 'Mid-range hotels, B&Bs ($15-40/night)',
-      food: 'Restaurant meals ($8-15/meal)',
-      transport: 'Tuk-tuks, some private transport ($5-20/journey)',
-      activities: 'Paid attractions, tours ($10-25/activity)'
-    },
-    {
-      category: 'Luxury Traveler',
-      range: '$80+/day',
-      accommodation: 'Luxury hotels, resorts ($40+/night)',
-      food: 'Fine dining, hotel restaurants ($15+/meal)',
-      transport: 'Private cars, domestic flights ($20+/journey)',
-      activities: 'Premium experiences, private guides ($25+/activity)'
-    },
-  ];
+  const fetchGuides = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/travel-guides${selectedCategory ? `?category=${selectedCategory}` : ''}`);
+      setGuides(response.data);
+    } catch (error) {
+      console.error('Error fetching guides:', error);
+      showSnackbar('Error loading travel guides', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const culturalTips = [
-    {
-      title: 'Religious Sites',
-      content: 'Remove shoes and hats. Dress modestly. Photography may be restricted.',
-      icon: <WarningIcon />
-    },
-    {
-      title: 'Greetings',
-      content: 'Ayubowan (ah-yu-bo-wan) means "may you live long" - traditional greeting.',
-      icon: <LanguageIcon />
-    },
-    {
-      title: 'Tipping',
-      content: '10% at restaurants if service charge not included. Round up for tuk-tuks.',
-      icon: <CurrencyIcon />
-    },
-    {
-      title: 'Bargaining',
-      content: 'Expected in markets and with tuk-tuk drivers. Start at 50% of asking price.',
-      icon: <CurrencyIcon />
-    },
-  ];
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbar({ open: true, message, severity });
+  };
 
-  const weatherSeasons = [
-    {
-      season: 'Dry Season (December - March)',
-      weather: 'Sunny, minimal rainfall',
-      temperature: '26-30°C (79-86°F)',
-      bestFor: 'Beach activities, hill country, cultural sites',
-      regions: 'West and South coasts, hill country'
-    },
-    {
-      season: 'Inter-monsoon (April - May)',
-      weather: 'Hot and humid, afternoon showers',
-      temperature: '28-32°C (82-90°F)',
-      bestFor: 'East coast beaches',
-      regions: 'East coast'
-    },
-    {
-      season: 'Southwest Monsoon (June - September)',
-      weather: 'Heavy rains in west and south',
-      temperature: '25-28°C (77-82°F)',
-      bestFor: 'East coast, cultural triangle',
-      regions: 'East coast, north central'
-    },
-    {
-      season: 'Northeast Monsoon (October - November)',
-      weather: 'Rains in north and east',
-      temperature: '26-29°C (79-84°F)',
-      bestFor: 'West and south coasts',
-      regions: 'West and south coasts'
-    },
-  ];
+  const handleOpenDialog = (guide = null) => {
+    if (guide) {
+      setEditingGuide(guide);
+      setFormData({
+        title: guide.title,
+        category: guide.category,
+        content: guide.content,
+        summary: guide.summary || '',
+        tags: Array.isArray(guide.tags) ? guide.tags.join(', ') : '',
+      });
+    } else {
+      setEditingGuide(null);
+      setFormData({
+        title: '',
+        category: 'planning',
+        content: '',
+        summary: '',
+        tags: '',
+      });
+    }
+    setImageFile(null);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setEditingGuide(null);
+    setImageFile(null);
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageChange = (e) => {
+    setImageFile(e.target.files[0]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const submitData = new FormData();
+    Object.keys(formData).forEach(key => {
+      if (key === 'tags') {
+        const arrayValue = formData[key].split(',').map(item => item.trim()).filter(item => item);
+        submitData.append(key, JSON.stringify(arrayValue));
+      } else {
+        submitData.append(key, formData[key]);
+      }
+    });
+    
+    if (imageFile) {
+      submitData.append('image', imageFile);
+    }
+
+    try {
+      if (editingGuide) {
+        await api.put(`/travel-guides/${editingGuide.id}`, submitData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        showSnackbar('Travel guide updated successfully!');
+      } else {
+        await api.post('/travel-guides', submitData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        showSnackbar('Travel guide added successfully!');
+      }
+      handleCloseDialog();
+      fetchGuides();
+    } catch (error) {
+      console.error('Error saving guide:', error);
+      showSnackbar(error.response?.data?.message || 'Error saving guide', 'error');
+    }
+  };
+
+  const handleDelete = async (guideId) => {
+    if (window.confirm('Are you sure you want to delete this guide?')) {
+      try {
+        await api.delete(`/travel-guides/${guideId}`);
+        showSnackbar('Travel guide deleted successfully!');
+        fetchGuides();
+      } catch (error) {
+        console.error('Error deleting guide:', error);
+        showSnackbar('Error deleting guide', 'error');
+      }
+    }
+  };
+
+  const handleMarkHelpful = async (guideId) => {
+    try {
+      await api.post(`/travel-guides/${guideId}/helpful`);
+      showSnackbar('Thank you for your feedback!');
+      fetchGuides();
+    } catch (error) {
+      console.error('Error marking helpful:', error);
+      showSnackbar('Error submitting feedback', 'error');
+    }
+  };
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Page Header */}
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
         <Typography variant="h3" component="h1" gutterBottom color="primary">
-          Sri Lanka Travel Guide
+          Sri Lanka Travel Guides
         </Typography>
         <Typography variant="h6" color="text.secondary">
-          Everything you need to know for an amazing trip to Sri Lanka
+          Community-contributed guides for traveling in Sri Lanka
         </Typography>
       </Box>
 
-      {/* Quick Navigation */}
+      {/* Add Guide Button */}
+      {user && (
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+          >
+            Add Travel Guide
+          </Button>
+        </Box>
+      )}
+
+      {/* Category Filter */}
       <Paper sx={{ mb: 4, p: 2 }}>
-        <Grid container spacing={2}>
-          {[
-            { id: 'planning', label: 'Trip Planning', icon: <ClockIcon /> },
-            { id: 'transport', label: 'Transportation', icon: <BusIcon /> },
-            { id: 'budget', label: 'Budget Guide', icon: <CurrencyIcon /> },
-            { id: 'culture', label: 'Cultural Tips', icon: <LanguageIcon /> },
-          ].map((tab) => (
-            <Grid item xs={6} sm={3} key={tab.id}>
-              <Button
-                fullWidth
-                variant={selectedTab === tab.id ? 'contained' : 'outlined'}
-                startIcon={tab.icon}
-                onClick={() => setSelectedTab(tab.id)}
-                sx={{ py: 1.5 }}
-              >
-                {tab.label}
-              </Button>
-            </Grid>
-          ))}
-        </Grid>
+        <FormControl fullWidth>
+          <InputLabel>Category</InputLabel>
+          <Select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            label="Category"
+          >
+            {categories.map((cat) => (
+              <MenuItem key={cat.value} value={cat.value}>
+                {cat.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Paper>
 
-      {/* Trip Planning Section */}
-      {selectedTab === 'planning' && (
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, height: '100%' }}>
-              <Typography variant="h5" gutterBottom color="primary">
-                <WeatherIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Best Time to Visit
-              </Typography>
-              {weatherSeasons.map((season, index) => (
-                <Accordion key={index}>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="h6">{season.season}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Typography variant="body2" paragraph>
-                      <strong>Weather:</strong> {season.weather}
-                    </Typography>
-                    <Typography variant="body2" paragraph>
-                      <strong>Temperature:</strong> {season.temperature}
-                    </Typography>
-                    <Typography variant="body2" paragraph>
-                      <strong>Best for:</strong> {season.bestFor}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Regions:</strong> {season.regions}
-                    </Typography>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, height: '100%' }}>
-              <Typography variant="h5" gutterBottom color="primary">
-                <PhoneIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Emergency Numbers
-              </Typography>
-              <List>
-                {emergencyNumbers.map((emergency, index) => (
-                  <ListItem key={index}>
-                    <ListItemIcon>
-                      <PhoneIcon color="error" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={emergency.service}
-                      secondary={emergency.number}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                Useful Apps
-              </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                <Chip label="PickMe (Taxi)" size="small" />
-                <Chip label="Uber" size="small" />
-                <Chip label="Google Translate" size="small" />
-                <Chip label="Maps.me (Offline)" size="small" />
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
-      )}
-
-      {/* Transportation Section */}
-      {selectedTab === 'transport' && (
-        <Grid container spacing={3}>
-          {transportOptions.map((transport, index) => (
-            <Grid item xs={12} md={6} key={index}>
-              <Card sx={{ height: '100%' }}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    {transport.icon}
-                    <Typography variant="h5" sx={{ ml: 1 }}>
-                      {transport.type}
-                    </Typography>
+      {/* Travel Guides */}
+      <Grid container spacing={3}>
+        {guides.map((guide) => (
+          <Grid item xs={12} key={guide.id}>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', pr: 2 }}>
+                  <Box>
+                    <Typography variant="h6">{guide.title}</Typography>
+                    <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+                      <Chip label={categories.find(c => c.value === guide.category)?.label} size="small" color="primary" />
+                      {guide.isOfficial && <Chip label="Official" size="small" color="success" />}
+                      {guide.isVerified && <Chip label="Verified" size="small" color="info" />}
+                      <Chip label={`👁 ${guide.viewCount}`} size="small" variant="outlined" />
+                      <Chip label={`👍 ${guide.helpfulCount}`} size="small" variant="outlined" />
+                    </Box>
                   </Box>
-                  <Typography variant="body1" paragraph>
-                    {transport.description}
-                  </Typography>
-                  
-                  <Typography variant="h6" color="success.main" gutterBottom>
-                    Pros:
-                  </Typography>
-                  <List dense>
-                    {transport.pros.map((pro, idx) => (
-                      <ListItem key={idx} sx={{ py: 0 }}>
-                        <Typography variant="body2">• {pro}</Typography>
-                      </ListItem>
-                    ))}
-                  </List>
-
-                  <Typography variant="h6" color="warning.main" gutterBottom>
-                    Cons:
-                  </Typography>
-                  <List dense>
-                    {transport.cons.map((con, idx) => (
-                      <ListItem key={idx} sx={{ py: 0 }}>
-                        <Typography variant="body2">• {con}</Typography>
-                      </ListItem>
-                    ))}
-                  </List>
-
-                  <Paper sx={{ p: 2, mt: 2, bgcolor: 'info.light', color: 'info.contrastText' }}>
-                    <Typography variant="body2">
-                      <strong>Tip:</strong> {transport.tips}
-                    </Typography>
-                  </Paper>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
-
-      {/* Budget Guide Section */}
-      {selectedTab === 'budget' && (
-        <Grid container spacing={3}>
-          {budgetGuide.map((budget, index) => (
-            <Grid item xs={12} md={4} key={index}>
-              <Card 
-                sx={{ 
-                  height: '100%',
-                  border: index === 1 ? `2px solid ${theme.palette.primary.main}` : 'none'
-                }}
-              >
-                <CardContent>
-                  <Typography variant="h5" color="primary" gutterBottom>
-                    {budget.category}
-                  </Typography>
-                  <Typography variant="h4" color="success.main" gutterBottom>
-                    {budget.range}
-                  </Typography>
-                  
-                  <List>
-                    <ListItem>
-                      <ListItemIcon><HotelIcon /></ListItemIcon>
-                      <ListItemText
-                        primary="Accommodation"
-                        secondary={budget.accommodation}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon><RestaurantIcon /></ListItemIcon>
-                      <ListItemText
-                        primary="Food"
-                        secondary={budget.food}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon><BusIcon /></ListItemIcon>
-                      <ListItemText
-                        primary="Transport"
-                        secondary={budget.transport}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon><FlightIcon /></ListItemIcon>
-                      <ListItemText
-                        primary="Activities"
-                        secondary={budget.activities}
-                      />
-                    </ListItem>
-                  </List>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
-
-      {/* Cultural Tips Section */}
-      {selectedTab === 'culture' && (
-        <Grid container spacing={3}>
-          {culturalTips.map((tip, index) => (
-            <Grid item xs={12} sm={6} key={index}>
-              <Paper sx={{ p: 3, height: '100%' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  {tip.icon}
-                  <Typography variant="h6" sx={{ ml: 1 }}>
-                    {tip.title}
-                  </Typography>
                 </Box>
-                <Typography variant="body1">
-                  {tip.content}
-                </Typography>
-              </Paper>
-            </Grid>
-          ))}
+              </AccordionSummary>
+              <AccordionDetails>
+                {guide.image && (
+                  <Box
+                    component="img"
+                    src={`http://localhost:5000${guide.image}`}
+                    alt={guide.title}
+                    sx={{ width: '100%', maxHeight: 300, objectFit: 'cover', mb: 2, borderRadius: 1 }}
+                  />
+                )}
+                
+                {guide.summary && (
+                  <Typography variant="subtitle1" color="text.secondary" paragraph>
+                    {guide.summary}
+                  </Typography>
+                )}
 
-          <Grid item xs={12}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h5" gutterBottom color="primary">
-                Language Basics
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="h6" gutterBottom>Sinhala Phrases</Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemText primary="Hello" secondary="Ayubowan (ah-yu-bo-wan)" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Thank you" secondary="Bohoma istuti (bo-ho-ma is-tu-ti)" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="How much?" secondary="Kiyada? (ki-ya-da)" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Water" secondary="Watura (wa-tu-ra)" />
-                    </ListItem>
-                  </List>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="h6" gutterBottom>Tamil Phrases</Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemText primary="Hello" secondary="Vanakkam (va-nak-kam)" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Thank you" secondary="Nandri (nan-dri)" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="How much?" secondary="Evvalavu? (ev-va-la-vu)" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Water" secondary="Thanni (than-ni)" />
-                    </ListItem>
-                  </List>
-                </Grid>
-              </Grid>
-            </Paper>
+                <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line' }}>
+                  {guide.content}
+                </Typography>
+
+                {guide.tags && guide.tags.length > 0 && (
+                  <Box sx={{ mb: 2 }}>
+                    {guide.tags.map((tag, index) => (
+                      <Chip key={index} label={tag} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
+                    ))}
+                  </Box>
+                )}
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+                  <Typography variant="caption" color="text.secondary">
+                    By {guide.author?.username || 'Unknown'} • {new Date(guide.createdAt).toLocaleDateString()}
+                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    {user && (
+                      <Button
+                        size="small"
+                        startIcon={<HelpfulIcon />}
+                        onClick={() => handleMarkHelpful(guide.id)}
+                      >
+                        Helpful
+                      </Button>
+                    )}
+                    {user && (user.id === guide.userId || user.role === 'admin') && (
+                      <>
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => handleOpenDialog(guide)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => handleDelete(guide.id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </>
+                    )}
+                  </Box>
+                </Box>
+              </AccordionDetails>
+            </Accordion>
           </Grid>
-        </Grid>
+        ))}
+      </Grid>
+
+      {/* No Results */}
+      {!loading && guides.length === 0 && (
+        <Paper sx={{ p: 4, textAlign: 'center' }}>
+          <Typography variant="h6" color="text.secondary" gutterBottom>
+            No travel guides found
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {user ? 'Be the first to share your travel knowledge!' : 'Check back soon for travel guides'}
+          </Typography>
+        </Paper>
       )}
+
+      {/* Add/Edit Dialog */}
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+        <DialogTitle>{editingGuide ? 'Edit Travel Guide' : 'Add New Travel Guide'}</DialogTitle>
+        <form onSubmit={handleSubmit}>
+          <DialogContent>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Guide Title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                    label="Category"
+                  >
+                    {categories.filter(c => c.value).map((cat) => (
+                      <MenuItem key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={2}
+                  label="Summary (Optional)"
+                  name="summary"
+                  value={formData.summary}
+                  onChange={handleInputChange}
+                  placeholder="Brief overview of the guide"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={10}
+                  label="Content"
+                  name="content"
+                  value={formData.content}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="Write your detailed travel guide here..."
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Tags"
+                  name="tags"
+                  value={formData.tags}
+                  onChange={handleInputChange}
+                  placeholder="Comma-separated, e.g., budget, backpacking, family"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  fullWidth
+                >
+                  Upload Image (Optional)
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </Button>
+                {imageFile && (
+                  <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                    Selected: {imageFile.name}
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button type="submit" variant="contained">
+              {editingGuide ? 'Update' : 'Add'} Guide
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

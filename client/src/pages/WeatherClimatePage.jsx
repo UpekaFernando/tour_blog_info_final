@@ -16,6 +16,8 @@ import {
   Chip,
   LinearProgress,
   Avatar,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import {
   WbSunny as SunnyIcon,
@@ -28,20 +30,51 @@ import {
   Umbrella as UmbrellaIcon,
   BeachAccess as BeachIcon,
   Terrain as MountainIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
+import api from '../utils/api';
 
 const WeatherClimatePage = () => {
   const [selectedRegion, setSelectedRegion] = useState(0);
-  const [currentWeather, setCurrentWeather] = useState(null);
+  const [liveWeather, setLiveWeather] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Mock weather data for different regions
+  // Cities for live weather
+  const cities = [
+    { name: 'Colombo', displayName: 'Colombo (West Coast)', icon: <BeachIcon />, climate: 'Tropical' },
+    { name: 'Kandy', displayName: 'Kandy (Hill Country)', icon: <MountainIcon />, climate: 'Tropical Highland' },
+    { name: 'Jaffna', displayName: 'Jaffna (North)', icon: <SunnyIcon />, climate: 'Tropical Dry' },
+  ];
+
+  useEffect(() => {
+    fetchLiveWeather();
+  }, [selectedRegion]);
+
+  const fetchLiveWeather = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const cityName = cities[selectedRegion].name;
+      const response = await api.get(`/weather/current/${cityName}`);
+      setLiveWeather(response.data);
+    } catch (err) {
+      console.error('Error fetching weather:', err);
+      setError('Unable to fetch live weather data. Showing static climate information.');
+      setLiveWeather(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Static climate data for reference
   const regions = [
     {
       name: 'Colombo (West Coast)',
       climate: 'Tropical',
       description: 'Warm and humid year-round with two monsoon seasons',
       icon: <BeachIcon />,
-      currentWeather: {
+      staticWeather: {
         temperature: 28,
         humidity: 75,
         windSpeed: 12,
@@ -71,7 +104,7 @@ const WeatherClimatePage = () => {
       climate: 'Tropical Highland',
       description: 'Cooler temperatures with distinct wet and dry seasons',
       icon: <MountainIcon />,
-      currentWeather: {
+      staticWeather: {
         temperature: 22,
         humidity: 82,
         windSpeed: 8,
@@ -101,7 +134,7 @@ const WeatherClimatePage = () => {
       climate: 'Tropical Dry',
       description: 'Hot and dry with minimal rainfall most of the year',
       icon: <SunnyIcon />,
-      currentWeather: {
+      staticWeather: {
         temperature: 32,
         humidity: 65,
         windSpeed: 15,
@@ -129,6 +162,7 @@ const WeatherClimatePage = () => {
   ];
 
   const currentRegion = regions[selectedRegion];
+  const currentWeather = liveWeather || currentRegion.staticWeather;
 
   const getWeatherIcon = (conditions) => {
     if (conditions.includes('Rain')) return <RainIcon />;
@@ -168,16 +202,23 @@ const WeatherClimatePage = () => {
           onChange={(event, newValue) => setSelectedRegion(newValue)}
           variant="fullWidth"
         >
-          {regions.map((region, index) => (
+          {cities.map((city, index) => (
             <Tab
               key={index}
-              icon={region.icon}
-              label={region.name}
+              icon={city.icon}
+              label={city.displayName}
               iconPosition="start"
             />
           ))}
         </Tabs>
       </Paper>
+
+      {/* Error Message */}
+      {error && (
+        <Alert severity="warning" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
 
       {/* Current Weather */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -186,33 +227,49 @@ const WeatherClimatePage = () => {
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h5">
-                  Current Weather in {currentRegion.name}
+                  {liveWeather ? 'Live Weather' : 'Climate Information'} - {currentRegion.name}
                 </Typography>
-                <Avatar sx={{ bgcolor: 'primary.main' }}>
-                  {getWeatherIcon(currentRegion.currentWeather.conditions)}
-                </Avatar>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {liveWeather && (
+                    <Chip label="LIVE" color="success" size="small" />
+                  )}
+                  <Avatar sx={{ bgcolor: 'primary.main' }}>
+                    {loading ? <CircularProgress size={24} color="inherit" /> : getWeatherIcon(currentWeather.conditions)}
+                  </Avatar>
+                </Box>
               </Box>
               
-              <Grid container spacing={2}>
-                <Grid item xs={6} sm={3}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <TempIcon color="error" sx={{ fontSize: 40 }} />
-                    <Typography variant="h4" color="error.main">
-                      {currentRegion.currentWeather.temperature}°C
-                    </Typography>
-                    <Typography variant="body2">Temperature</Typography>
-                  </Box>
-                </Grid>
-                
-                <Grid item xs={6} sm={3}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <HumidityIcon color="info" sx={{ fontSize: 40 }} />
-                    <Typography variant="h4" color="info.main">
-                      {currentRegion.currentWeather.humidity}%
-                    </Typography>
-                    <Typography variant="body2">Humidity</Typography>
-                  </Box>
-                </Grid>
+              {loading ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <CircularProgress />
+                  <Typography variant="body2" sx={{ mt: 2 }}>Loading weather data...</Typography>
+                </Box>
+              ) : (
+                <Grid container spacing={2}>
+                  <Grid item xs={6} sm={3}>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <TempIcon color="error" sx={{ fontSize: 40 }} />
+                      <Typography variant="h4" color="error.main">
+                        {currentWeather.temperature}°C
+                      </Typography>
+                      <Typography variant="body2">Temperature</Typography>
+                      {liveWeather?.feelsLike && (
+                        <Typography variant="caption" color="text.secondary">
+                          Feels like {liveWeather.feelsLike}°C
+                        </Typography>
+                      )}
+                    </Box>
+                  </Grid>
+                  
+                  <Grid item xs={6} sm={3}>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <HumidityIcon color="info" sx={{ fontSize: 40 }} />
+                      <Typography variant="h4" color="info.main">
+                        {currentWeather.humidity}%
+                      </Typography>
+                      <Typography variant="body2">Humidity</Typography>
+                    </Box>
+                  </Grid>
                 
                 <Grid item xs={6} sm={3}>
                   <Box sx={{ textAlign: 'center' }}>

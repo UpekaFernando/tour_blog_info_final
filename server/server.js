@@ -10,15 +10,20 @@ const destinationRoutes = require('./routes/destinationRoutes');
 const districtRoutes = require('./routes/districtRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const ratingRoutes = require('./routes/ratingRoutes');
+const localServiceRoutes = require('./routes/localServiceRoutes');
+const travelGuideRoutes = require('./routes/travelGuideRoutes');
+const weatherRoutes = require('./routes/weatherRoutes');
 
 // Config
 dotenv.config();
 const app = express();
 
-// Middleware
+// Middleware - CORS configuration
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'], // Allow both Vite and Create React App ports
-  credentials: true
+  origin: true, // Allow all origins in development
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,6 +37,46 @@ app.use('/api', (req, res, next) => {
 });
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Root API endpoint
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Sri Lanka Tour Blog API',
+    version: '1.0.0',
+    status: 'Running',
+    endpoints: {
+      users: {
+        register: 'POST /api/users/register',
+        login: 'POST /api/users/login',
+        profile: 'GET /api/users/profile',
+      },
+      destinations: {
+        getAll: 'GET /api/destinations',
+        getById: 'GET /api/destinations/:id',
+        create: 'POST /api/destinations',
+        update: 'PUT /api/destinations/:id',
+        delete: 'DELETE /api/destinations/:id',
+      },
+      districts: {
+        getAll: 'GET /api/districts',
+        getById: 'GET /api/districts/:id',
+      },
+      comments: {
+        getByDestination: 'GET /api/comments/destination/:destinationId',
+        create: 'POST /api/comments',
+        update: 'PUT /api/comments/:id',
+        delete: 'DELETE /api/comments/:id',
+      },
+      ratings: {
+        getByDestination: 'GET /api/ratings/destination/:destinationId',
+        create: 'POST /api/ratings',
+        update: 'PUT /api/ratings/:id',
+        delete: 'DELETE /api/ratings/:id',
+      },
+      test: 'GET /api/test',
+    },
+  });
+});
 
 // Test route
 app.get('/api/test', async (req, res) => {
@@ -74,6 +119,9 @@ app.use('/api/destinations', destinationRoutes);
 app.use('/api/districts', districtRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/ratings', ratingRoutes);
+app.use('/api/local-services', localServiceRoutes);
+app.use('/api/travel-guides', travelGuideRoutes);
+app.use('/api/weather', weatherRoutes);
 
 // Start server and connect to database
 const PORT = process.env.PORT || 5000;
