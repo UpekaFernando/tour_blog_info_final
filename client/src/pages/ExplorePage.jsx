@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getImageUrl } from '../utils/api';
 import {
   Container,
   Typography,
@@ -109,12 +110,12 @@ const ExplorePage = () => {
     );
   };
 
-  const getImageUrl = (destination) => {
+  const getDestinationImageUrl = (destination) => {
     if (destination.images && destination.images.length > 0) {
       const firstImage = destination.images[0];
       return firstImage.startsWith('http')
         ? firstImage
-        : `http://localhost:5000${firstImage}`;
+        : getImageUrl(firstImage);
     }
     return 'https://via.placeholder.com/400x250?text=No+Image';
   };
@@ -234,7 +235,7 @@ const ExplorePage = () => {
                   <CardMedia
                     component="img"
                     height="200"
-                    image={getImageUrl(destination)}
+                    image={getDestinationImageUrl(destination)}
                     alt={destination.title}
                     sx={{ objectFit: 'cover' }}
                   />

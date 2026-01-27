@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getImageUrl } from '../utils/api';
 import {
   Card,
   CardActionArea,
@@ -30,7 +31,7 @@ const DestinationCard = ({ destination }) => {
       imageUrl = destination.images[0];
     } else {
       // Add the base URL to the image path from server
-      imageUrl = `http://localhost:5000${destination.images[0]}`;
+      imageUrl = getImageUrl(destination.images[0]);
     }
   }
 

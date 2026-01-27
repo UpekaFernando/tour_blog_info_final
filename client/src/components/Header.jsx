@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { getImageUrl } from '../utils/api';
 import { 
   AppBar, 
   Toolbar, 
@@ -150,7 +151,7 @@ const Header = () => {
                   {currentUser?.profilePicture ? (
                     <Avatar 
                       alt={currentUser.name} 
-                      src={`http://localhost:5000${currentUser.profilePicture}?t=${Date.now()}`}
+                      src={`${getImageUrl(currentUser.profilePicture)}?t=${Date.now()}`}
                       sx={{ width: 32, height: 32 }}
                     />
                   ) : (

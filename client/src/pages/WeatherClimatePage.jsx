@@ -271,7 +271,7 @@ const WeatherClimatePage = () => {
                     </Box>
                   </Grid>
                 
-                <Grid item xs={6} sm={3}>
+                  <Grid item xs={6} sm={3}>
                   <Box sx={{ textAlign: 'center' }}>
                     <WindIcon color="success" sx={{ fontSize: 40 }} />
                     <Typography variant="h4" color="success.main">
@@ -281,7 +281,7 @@ const WeatherClimatePage = () => {
                   </Box>
                 </Grid>
                 
-                <Grid item xs={6} sm={3}>
+                  <Grid item xs={6} sm={3}>
                   <Box sx={{ textAlign: 'center' }}>
                     <VisibilityIcon color="secondary" sx={{ fontSize: 40 }} />
                     <Typography variant="h4" color="secondary.main">
@@ -291,6 +291,7 @@ const WeatherClimatePage = () => {
                   </Box>
                 </Grid>
               </Grid>
+              )}
 
               <Box sx={{ mt: 3 }}>
                 <Typography variant="body1" gutterBottom>

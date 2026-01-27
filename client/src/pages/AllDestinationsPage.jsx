@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getDestinations } from '../utils/api';
+import { getDestinations, getImageUrl } from '../utils/api';
 
 const AllDestinationsPage = () => {
   const [destinations, setDestinations] = useState([]);
@@ -22,7 +22,7 @@ const AllDestinationsPage = () => {
           destinations.map(dest => (
             <div key={dest.id || dest._id} style={{ border: '1px solid #ccc', padding: '1rem', width: 250 }}>
               <img
-                src={`http://localhost:5000${dest.images?.[0] || '/default.jpg'}`}
+                src={getImageUrl(dest.images?.[0] || '/default.jpg')}
                 alt={dest.title}
                 style={{ width: '100%', height: 150, objectFit: 'cover' }}
               />

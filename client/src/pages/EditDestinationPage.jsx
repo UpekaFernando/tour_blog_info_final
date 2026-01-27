@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getImageUrl } from '../utils/api';
 import {
   Container,
   Typography,
@@ -417,7 +418,7 @@ const EditDestinationPage = () => {
                     {existingImages.map((imageUrl, index) => (
                       <ImageListItem key={index}>
                         <img
-                          src={`http://localhost:5000${imageUrl}`}
+                          src={getImageUrl(imageUrl)}
                           alt={`Existing ${index + 1}`}
                           loading="lazy"
                           style={{ height: 200, objectFit: 'cover' }}

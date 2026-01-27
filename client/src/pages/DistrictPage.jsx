@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
+import { getImageUrl } from '../utils/api';
 import {
   Container,
   Typography,
@@ -95,7 +96,7 @@ const DistrictPage = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundImage: `url(http://localhost:5000${district.imageUrl})`,
+            backgroundImage: `url(${getImageUrl(district.imageUrl)})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             filter: 'brightness(0.7)'

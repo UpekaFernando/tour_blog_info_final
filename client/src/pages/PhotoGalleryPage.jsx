@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getImageUrl } from '../utils/api';
 import {
   Container,
   Typography,
@@ -164,7 +165,7 @@ const PhotoGalleryPage = () => {
 
   const handleDownload = (photo) => {
     const link = document.createElement('a');
-    link.href = `http://localhost:5000${photo.url}`;
+    link.href = getImageUrl(photo.url);
     link.download = photo.title;
     document.body.appendChild(link);
     link.click();
@@ -248,8 +249,8 @@ const PhotoGalleryPage = () => {
             onClick={() => setSelectedPhoto(photo)}
           >
             <img
-              src={`http://localhost:5000${photo.url}?w=248&fit=crop&auto=format`}
-              srcSet={`http://localhost:5000${photo.url}?w=248&fit=crop&auto=format&dpr=2 2x`}
+              src={`${getImageUrl(photo.url)}?w=248&fit=crop&auto=format`}
+              srcSet={`${getImageUrl(photo.url)}?w=248&fit=crop&auto=format&dpr=2 2x`}
               alt={photo.title}
               loading="lazy"
               style={{
@@ -326,7 +327,7 @@ const PhotoGalleryPage = () => {
             <DialogContent>
               <Box sx={{ textAlign: 'center', mb: 2 }}>
                 <img
-                  src={`http://localhost:5000${selectedPhoto.url}`}
+                  src={getImageUrl(selectedPhoto.url)}
                   alt={selectedPhoto.title}
                   style={{
                     maxWidth: '100%',

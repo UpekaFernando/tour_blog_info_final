@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
+import { getImageUrl } from '../utils/api';
 import {
   Container,
   Typography,
@@ -94,9 +95,10 @@ const LocalServicesPage = () => {
     try {
       const categoryValue = categories[selectedCategory].value;
       const response = await api.get(`/local-services${categoryValue ? `?category=${categoryValue}` : ''}`);
-      setServices(response.data);
+      setServices(response.data || []);
     } catch (error) {
       console.error('Error fetching services:', error);
+      setServices([]);
       showSnackbar('Error loading services', 'error');
     } finally {
       setLoading(false);
@@ -217,7 +219,7 @@ const LocalServicesPage = () => {
     }
   };
 
-  const filteredServices = services.filter(service =>
+  const filteredServices = (services || []).filter(service =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     service.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     service.location.toLowerCase().includes(searchTerm.toLowerCase())
@@ -303,7 +305,7 @@ const LocalServicesPage = () => {
                 <CardMedia
                   component="img"
                   height="200"
-                  image={`http://localhost:5000${service.image}`}
+                  image={getImageUrl(service.image)}
                   alt={service.name}
                   sx={{ objectFit: 'cover' }}
                 />

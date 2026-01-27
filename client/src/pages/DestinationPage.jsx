@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { getImageUrl } from '../utils/api';
 import {
   Container,
   Typography,
@@ -197,7 +198,7 @@ const DestinationPage = () => {
         {destination.images && destination.images.length > 0 && (
           <Box sx={{ position: 'relative', height: 400 }}>
             <img
-              src={`http://localhost:5000${destination.images[currentImage]}`}
+              src={getImageUrl(destination.images[currentImage])}
               alt={`${destination.title} - image ${currentImage + 1}`}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />

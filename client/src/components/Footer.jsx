@@ -3,6 +3,7 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import { Link as RouterLink } from 'react-router-dom';
+import { getImageUrl } from '../utils/api';
 
 const Footer = () => {
   // Example: fetch destinations and users (replace with real data fetching in production)
@@ -40,7 +41,7 @@ const Footer = () => {
               {exampleDestinations.map((dest, idx) => (
                 <Box key={idx} sx={{ width: 60, height: 40, overflow: 'hidden', borderRadius: 2, bgcolor: 'grey.300' }}>
                   <img
-                    src={`http://localhost:5000${dest.image}`}
+                    src={getImageUrl(dest.image)}
                     alt={dest.title}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
@@ -68,7 +69,7 @@ const Footer = () => {
               {exampleUsers.map((user, idx) => (
                 <Box key={idx} sx={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', bgcolor: 'grey.300' }}>
                   <img
-                    src={`http://localhost:5000${user.profilePicture}`}
+                    src={getImageUrl(user.profilePicture)}
                     alt={user.name}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />

@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
+import { getImageUrl } from '../utils/api';
 import {
   Container,
   Typography,
@@ -253,7 +254,7 @@ const TravelGuidePage = () => {
                 {guide.image && (
                   <Box
                     component="img"
-                    src={`http://localhost:5000${guide.image}`}
+                    src={getImageUrl(guide.image)}
                     alt={guide.title}
                     sx={{ width: '100%', maxHeight: 300, objectFit: 'cover', mb: 2, borderRadius: 1 }}
                   />

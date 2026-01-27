@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://13.218.231.9:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://13.218.231.9:5000/api';
+
+// Backend server URL for images and uploads
+export const BACKEND_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://13.218.231.9:5000';
 
 // Create API client with Authentication
 const createAPIClient = (token = null) => {
@@ -258,4 +261,11 @@ export const getUserProfile = async (token) => {
 export const updateUserProfile = async (userData, token) => {
   const response = await createAPIClient(token).put('/users/profile', userData);
   return response.data;
+};
+
+// Helper function to get full image URL
+export const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith('http')) return imagePath;
+  return `${BACKEND_URL}${imagePath}`;
 };

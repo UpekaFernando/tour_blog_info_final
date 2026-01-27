@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getImageUrl } from '../utils/api';
 import {
   Container,
   Typography,
@@ -238,8 +239,8 @@ const ProfilePage = () => {
                   : profile?.profilePicture
                   ? (() => {
                       const imageUrl = profile.profilePicture.startsWith('/uploads') 
-                        ? `http://localhost:5000${profile.profilePicture}?t=${Date.now()}`
-                        : `http://localhost:5000/uploads/${profile.profilePicture}?t=${Date.now()}`;
+                        ? `${getImageUrl(profile.profilePicture)}?t=${Date.now()}`
+                        : `${getImageUrl(`/uploads/${profile.profilePicture}`)}?t=${Date.now()}`;
                       console.log('Profile image URL:', imageUrl);
                       return imageUrl;
                     })()
@@ -426,7 +427,7 @@ const ProfilePage = () => {
                     <Avatar
                       src={
                         dest.images && dest.images.length > 0
-                          ? `http://localhost:5000${dest.images[0]}`
+                          ? getImageUrl(dest.images[0])
                           : undefined
                       }
                       alt={dest.title}

@@ -30,7 +30,7 @@ exports.getAllLocalServices = async (req, res) => {
       include: [{
         model: User,
         as: 'user',
-        attributes: ['id', 'username', 'email']
+        attributes: ['id', 'name', 'email']
       }],
       order: [['createdAt', 'DESC']]
     });
@@ -49,7 +49,7 @@ exports.getLocalServiceById = async (req, res) => {
       include: [{
         model: User,
         as: 'user',
-        attributes: ['id', 'username', 'email']
+        attributes: ['id', 'name', 'email']
       }]
     });
     
@@ -114,7 +114,7 @@ exports.createLocalService = async (req, res) => {
       include: [{
         model: User,
         as: 'user',
-        attributes: ['id', 'username', 'email']
+        attributes: ['id', 'name', 'email']
       }]
     });
     
@@ -185,7 +185,7 @@ exports.updateLocalService = async (req, res) => {
       include: [{
         model: User,
         as: 'user',
-        attributes: ['id', 'username', 'email']
+        attributes: ['id', 'name', 'email']
       }]
     });
     
