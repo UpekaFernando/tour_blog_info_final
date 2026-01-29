@@ -1,107 +1,63 @@
-# Sri Lanka Travel Blog
+# Tour Blog - Sri Lanka Travel Information Platform
 
-An interactive travel blog website featuring Sri Lanka's destinations with district-wise navigation.
+A full-stack web application for exploring Sri Lankan destinations with React, Node.js, and MySQL.
 
-## Features
+## 🚀 Quick Start
 
-- Interactive Sri Lanka map with district-wise navigation
-- User authentication (registration & login)
-- Blog creation for registered users
-- District and destination management
-- Photo upload functionality
-- Responsive design for both international and local users
-
-## Tech Stack
-
-### Frontend
-- React.js with Vite
-- Material-UI for UI components
-- React Router for navigation
-- Axios for API requests
-- Mapbox GL for interactive maps
-- Styled Components for custom styling
-
-### Backend
-- Node.js with Express.js
-- MongoDB with Mongoose ODM
-- JWT for authentication
-- Bcrypt for password hashing
-- Multer for file uploads
-
-## Setup Instructions
-
-### Prerequisites
-- Node.js (v14 or higher)
-- MongoDB (local or Atlas)
-
-### Installation
-
-1. **Clone the repository**
-   ```
-   git clone <repository-url>
-   cd tour_blog_info
-   ```
-
-2. **Backend Setup**
-   ```
-   cd server
-   npm install
-   ```
-   
-   Create a `.env` file in the server directory with the following variables:
-   ```
-   PORT=5000
-   MONGO_URI=mongodb://localhost:27017/sri_lanka_travel_blog
-   JWT_SECRET=your_secret_key
-   NODE_ENV=development
-   ```
-
-3. **Frontend Setup**
-   ```
-   cd ../client
-   npm install
-   ```
-   
-   For using the map feature, you'll need a Mapbox token. Add it to the SriLankaMap component.
-
-### Running the Application
-
-1. **Start the Backend Server**
-   ```
-   cd server
-   npm run dev
-   ```
-
-2. **Start the Frontend Development Server**
-   ```
-   cd client
-   npm run dev
-   ```
-
-3. Open your browser and navigate to `http://localhost:5173`
-
-## Project Structure
-
-```
-tour_blog_info/
-├── client/                # Frontend React application
-│   ├── public/            # Static files
-│   └── src/
-│       ├── assets/        # Images and other assets
-│       ├── components/    # Reusable UI components
-│       ├── context/       # React context providers
-│       ├── pages/         # Page components
-│       └── utils/         # Utility functions and API calls
-│
-├── server/                # Backend Node.js application
-│   ├── config/            # Configuration files
-│   ├── controllers/       # Route controllers
-│   ├── middleware/        # Custom middleware
-│   ├── models/            # Mongoose models
-│   ├── routes/            # API routes
-│   └── uploads/           # Uploaded files storage
+```bash
+docker compose up -d
 ```
 
-## License
+Access: http://localhost:5173
 
-This project is licensed under the MIT License.
+## 📁 Essential Files
+
+1. **client/Dockerfile** - Frontend container configuration
+2. **server/Dockerfile** - Backend container configuration  
+3. **docker-compose.yml** - Multi-container orchestration
+4. **.dockerignore** - Docker build exclusions (in client/ and server/)
+5. **Jenkinsfile** - CI/CD pipeline configuration
+6. **terraform/** - Infrastructure as Code (main.tf, variables.tf, outputs.tf, user-data.sh)
+7. **.gitignore** - Git exclusions
+
+## 🛠️ Technology Stack
+
+- **Frontend**: React 18 + Vite + Material-UI
+- **Backend**: Node.js + Express + Sequelize
+- **Database**: MySQL 8.0
+- **DevOps**: Docker, Jenkins, Terraform, AWS
+
+## 🐳 Docker Services
+
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:5000/api
+- **phpMyAdmin**: http://localhost:8081
+- **MySQL**: localhost:3306
+
+## 📚 Commands
+
+```bash
+# Start services
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop services
+docker compose down
+
+# Deploy to AWS
+cd terraform && terraform apply
+```
+
+## 🔧 Environment
+
+**Database:**
+- Host: mysql
+- Database: sri_lanka_travel
+- User: root
+- Password: root
+
+## 📞 Author
+
+Upeka - Tour Blog System
