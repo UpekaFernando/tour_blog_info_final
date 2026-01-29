@@ -34,10 +34,10 @@ chown -R ubuntu:ubuntu /home/ubuntu/tour-blog
 # Create .env file for backend
 cat > /home/ubuntu/tour-blog/server/.env << EOF
 PORT=5000
-DB_HOST=${db_host}
-DB_USER=${db_user}
-DB_PASSWORD='${db_password}'
-DB_NAME=${db_name}
+DB_HOST=$${db_host}
+DB_USER=$${db_user}
+DB_PASSWORD='$${db_password}'
+DB_NAME=$${db_name}
 JWT_SECRET=$(openssl rand -hex 32)
 NODE_ENV=production
 EOF
@@ -45,14 +45,14 @@ EOF
 chown ubuntu:ubuntu /home/ubuntu/tour-blog/server/.env
 
 # Create deployment script
-cat > /home/ubuntu/deploy.sh << 'EOF'
+cat > /home/ubuntu/deploy.sh << 'EOFINNER'
 #!/bin/bash
 cd /home/ubuntu/tour-blog/server
 npm install
 pm2 restart tour-blog-api || pm2 start server.js --name tour-blog-api
 pm2 save
 pm2 startup
-EOF
+EOFINNER
 
 chmod +x /home/ubuntu/deploy.sh
 chown ubuntu:ubuntu /home/ubuntu/deploy.sh

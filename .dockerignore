@@ -1,0 +1,39 @@
+# ================================
+# Common Exclusions
+# ================================
+node_modules
+npm-debug.log
+.env
+.env.local
+.env.*.local
+
+# IDE and Editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Test coverage
+coverage
+
+# ================================
+# Backend-Specific Exclusions
+# ================================
+dist
+build
+uploads/*
+!uploads/.gitkeep
+
+# ================================
+# Frontend-Specific Exclusions
+# ================================
+# dist (keep for Docker build)
