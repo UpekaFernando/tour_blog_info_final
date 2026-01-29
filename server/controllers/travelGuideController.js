@@ -26,7 +26,7 @@ exports.getAllTravelGuides = async (req, res) => {
       include: [{
         model: User,
         as: 'author',
-        attributes: ['id', 'username', 'email']
+        attributes: ['id', 'name', 'email']
       }],
       order: [['createdAt', 'DESC']]
     });
@@ -45,7 +45,7 @@ exports.getTravelGuideById = async (req, res) => {
       include: [{
         model: User,
         as: 'author',
-        attributes: ['id', 'username', 'email']
+        attributes: ['id', 'name', 'email']
       }]
     });
     
@@ -91,7 +91,7 @@ exports.createTravelGuide = async (req, res) => {
       include: [{
         model: User,
         as: 'author',
-        attributes: ['id', 'username', 'email']
+        attributes: ['id', 'name', 'email']
       }]
     });
     
@@ -140,7 +140,7 @@ exports.updateTravelGuide = async (req, res) => {
       include: [{
         model: User,
         as: 'author',
-        attributes: ['id', 'username', 'email']
+        attributes: ['id', 'name', 'email']
       }]
     });
     

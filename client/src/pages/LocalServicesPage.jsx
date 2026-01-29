@@ -1,676 +1,407 @@
-import { useState, useEffect, useContext } from 'react';
-import { getImageUrl } from '../utils/api';
+import { useState } from 'react';
 import {
   Container,
   Typography,
   Box,
   Grid,
-  Paper,
   Card,
   CardContent,
   CardMedia,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
   Chip,
-  Button,
-  TextField,
-  InputAdornment,
   Tabs,
   Tab,
   Rating,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  IconButton,
-  Alert,
-  Snackbar,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  Divider,
 } from '@mui/material';
 import {
-  Restaurant as RestaurantIcon,
-  Hotel as HotelIcon,
-  LocalTaxi as TaxiIcon,
-  Search as SearchIcon,
-  Phone as PhoneIcon,
-  LocationOn as LocationIcon,
-  Schedule as ScheduleIcon,
-  AttachMoney as MoneyIcon,
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Email as EmailIcon,
+  Restaurant,
+  Hotel,
+  DirectionsCar,
+  Phone,
+  Language as WebIcon,
+  LocationOn,
+  RoomService,
 } from '@mui/icons-material';
-import { AuthContext } from '../context/AuthContext';
-import api from '../utils/api';
 
 const LocalServicesPage = () => {
-  const { user } = useContext(AuthContext);
-  const [selectedCategory, setSelectedCategory] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [editingService, setEditingService] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  
-  const [formData, setFormData] = useState({
-    name: '',
-    category: 'restaurant',
-    subcategory: '',
-    description: '',
-    location: '',
-    district: '',
-    address: '',
-    phone: '',
-    email: '',
-    website: '',
-    priceRange: '$$',
-    openHours: '',
-    features: '',
-    specialties: '',
-    amenities: '',
-    services: '',
-  });
-  const [imageFile, setImageFile] = useState(null);
+  const [selectedTab, setSelectedTab] = useState(0);
 
-  const categories = [
-    { label: 'All', value: '', icon: <SearchIcon /> },
-    { label: 'Restaurants', value: 'restaurant', icon: <RestaurantIcon /> },
-    { label: 'Hotels', value: 'hotel', icon: <HotelIcon /> },
-    { label: 'Transport', value: 'transport', icon: <TaxiIcon /> },
+  const services = {
+    restaurants: [
+      {
+        id: 1,
+        name: 'Ministry of Crab',
+        category: 'Fine Dining',
+        location: 'Colombo Fort',
+        image: 'https://via.placeholder.com/400x250/1976d2/ffffff?text=Ministry+of+Crab',
+        rating: 4.8,
+        priceRange: '$$$$',
+        cuisine: 'Seafood, Sri Lankan',
+        phone: '+94 11 234 2722',
+        website: 'ministryofcrab.com',
+        highlights: ['Fresh Crab', 'Iconic Location', 'Celebrity Chef', 'Lagoon Crab'],
+        description: 'World-renowned seafood restaurant specializing in Sri Lankan crab dishes.'
+      },
+      {
+        id: 2,
+        name: 'The Gallery Café',
+        category: 'Café & Restaurant',
+        location: 'Colombo 03',
+        image: 'https://via.placeholder.com/400x250/2e7d32/ffffff?text=Gallery+Cafe',
+        rating: 4.6,
+        priceRange: '$$$',
+        cuisine: 'International, Fusion',
+        phone: '+94 11 258 2162',
+        website: 'paradiseroad.lk',
+        highlights: ['Garden Setting', 'Art Gallery', 'Sunday Brunch', 'Designer Venue'],
+        description: 'Stylish café in a converted warehouse with art gallery and beautiful garden.'
+      },
+      {
+        id: 3,
+        name: 'Upali\'s by Nawaloka',
+        category: 'Local Cuisine',
+        location: 'Colombo 03',
+        image: 'https://via.placeholder.com/400x250/ed6c02/ffffff?text=Upalis',
+        rating: 4.5,
+        priceRange: '$$',
+        cuisine: 'Sri Lankan',
+        phone: '+94 11 257 3370',
+        highlights: ['Rice & Curry', 'Authentic Flavors', 'Local Favorite', 'Affordable'],
+        description: 'Famous for authentic Sri Lankan rice and curry with generous portions.'
+      },
+      {
+        id: 4,
+        name: 'Curry Leaf',
+        category: 'Hotel Restaurant',
+        location: 'Hilton Colombo',
+        image: 'https://via.placeholder.com/400x250/9c27b0/ffffff?text=Curry+Leaf',
+        rating: 4.7,
+        priceRange: '$$$',
+        cuisine: 'South Asian',
+        phone: '+94 11 249 2492',
+        highlights: ['Buffet', 'Live Stations', 'Luxury Setting', 'Variety'],
+        description: 'Upscale restaurant offering extensive buffets with Sri Lankan and regional cuisine.'
+      }
+    ],
+    hotels: [
+      {
+        id: 1,
+        name: 'Galle Face Hotel',
+        category: '5-Star Heritage',
+        location: 'Colombo 03',
+        image: 'https://via.placeholder.com/400x250/0288d1/ffffff?text=Galle+Face+Hotel',
+        rating: 4.7,
+        priceRange: '$$$$',
+        phone: '+94 11 254 1010',
+        website: 'gallefacehotel.com',
+        highlights: ['Ocean View', 'Historic Property', 'Colonial Charm', 'Prime Location'],
+        amenities: ['Pool', 'Spa', 'Multiple Restaurants', 'Ocean Facing'],
+        description: 'Iconic 1864 hotel with colonial charm and stunning Indian Ocean views.'
+      },
+      {
+        id: 2,
+        name: 'Jetwing Lighthouse',
+        category: 'Boutique Hotel',
+        location: 'Galle',
+        image: 'https://via.placeholder.com/400x250/d32f2f/ffffff?text=Jetwing+Lighthouse',
+        rating: 4.8,
+        priceRange: '$$$$',
+        phone: '+94 91 222 3744',
+        website: 'jetwinghotels.com',
+        highlights: ['Geoffrey Bawa Design', 'Clifftop Views', 'Infinity Pool', 'Fine Dining'],
+        amenities: ['Spa', 'Gym', 'Multiple Pools', 'Beach Access'],
+        description: 'Stunning clifftop hotel designed by renowned architect Geoffrey Bawa.'
+      },
+      {
+        id: 3,
+        name: '98 Acres Resort',
+        category: 'Hill Country Resort',
+        location: 'Ella',
+        image: 'https://via.placeholder.com/400x250/00695c/ffffff?text=98+Acres',
+        rating: 4.6,
+        priceRange: '$$$',
+        phone: '+94 57 222 4040',
+        website: '98acresresort.com',
+        highlights: ['Mountain Views', 'Tea Plantation', 'Nature Walks', 'Chalets'],
+        amenities: ['Restaurant', 'Nature Trails', 'Tea Factory Tours'],
+        description: 'Eco-resort nestled in a tea plantation with breathtaking mountain views.'
+      },
+      {
+        id: 4,
+        name: 'Cinnamon Lodge Habarana',
+        category: 'Wildlife Lodge',
+        location: 'Habarana',
+        image: 'https://via.placeholder.com/400x250/f57c00/ffffff?text=Cinnamon+Lodge',
+        rating: 4.5,
+        priceRange: '$$$',
+        phone: '+94 66 227 0011',
+        website: 'cinnamonhotels.com',
+        highlights: ['Near National Parks', 'Safari Access', 'Nature Setting', 'Family Friendly'],
+        amenities: ['Large Pool', 'Multiple Restaurants', 'Kids Club', 'Safari Desk'],
+        description: 'Perfect base for exploring ancient cities and national parks of the Cultural Triangle.'
+      }
+    ],
+    transport: [
+      {
+        id: 1,
+        name: 'Sri Lanka Railways',
+        category: 'Train Service',
+        location: 'Island-wide',
+        image: 'https://via.placeholder.com/400x250/1976d2/ffffff?text=Railway',
+        rating: 4.3,
+        priceRange: '$',
+        phone: '+94 11 434 2215',
+        website: 'railway.gov.lk',
+        highlights: ['Scenic Routes', 'Affordable', 'Colombo-Kandy-Ella', 'Coastal Line'],
+        description: 'Iconic train journeys including the famous Kandy to Ella scenic route.'
+      },
+      {
+        id: 2,
+        name: 'PickMe',
+        category: 'Ride-Hailing App',
+        location: 'Major Cities',
+        image: 'https://via.placeholder.com/400x250/2e7d32/ffffff?text=PickMe',
+        rating: 4.5,
+        priceRange: '$$',
+        phone: '+94 11 760 0600',
+        website: 'pickme.lk',
+        highlights: ['App-Based', 'Fixed Prices', 'Tuk-Tuks & Cars', 'Safe & Reliable'],
+        description: 'Sri Lanka\'s leading ride-hailing service for tuk-tuks, cars, and bikes.'
+      },
+      {
+        id: 3,
+        name: 'Malkey Rent A Car',
+        category: 'Car Rental with Driver',
+        location: 'Colombo',
+        image: 'https://via.placeholder.com/400x250/ed6c02/ffffff?text=Car+Rental',
+        rating: 4.7,
+        priceRange: '$$$',
+        phone: '+94 11 269 4469',
+        website: 'malkey.lk',
+        highlights: ['With Driver', 'Well-Maintained Fleet', 'Airport Pickup', 'Flexible Tours'],
+        description: 'Reliable car rental service with professional drivers for touring Sri Lanka.'
+      },
+      {
+        id: 4,
+        name: 'Cinnamon Air',
+        category: 'Seaplane Service',
+        location: 'Colombo & Resorts',
+        image: 'https://via.placeholder.com/400x250/9c27b0/ffffff?text=Seaplane',
+        rating: 4.9,
+        priceRange: '$$$$',
+        phone: '+94 11 247 5475',
+        website: 'cinnamonair.com',
+        highlights: ['Scenic Flights', 'Quick Transfer', 'Luxury Travel', 'Aerial Views'],
+        description: 'Luxury seaplane transfers between Colombo and resort destinations.'
+      }
+    ]
+  };
+
+  const tabs = [
+    { label: 'Restaurants', icon: <Restaurant />, key: 'restaurants' },
+    { label: 'Hotels', icon: <Hotel />, key: 'hotels' },
+    { label: 'Transport', icon: <DirectionsCar />, key: 'transport' },
   ];
 
-  useEffect(() => {
-    fetchServices();
-  }, [selectedCategory]);
+  const currentServices = services[tabs[selectedTab].key];
 
-  const fetchServices = async () => {
-    setLoading(true);
-    try {
-      const categoryValue = categories[selectedCategory].value;
-      const response = await api.get(`/local-services${categoryValue ? `?category=${categoryValue}` : ''}`);
-      setServices(response.data || []);
-    } catch (error) {
-      console.error('Error fetching services:', error);
-      setServices([]);
-      showSnackbar('Error loading services', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const renderServiceCard = (service) => (
+    <Grid item xs={12} md={6} key={service.id}>
+      <Card 
+        elevation={3}
+        sx={{ 
+          height: '100%',
+          transition: 'all 0.3s',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: 6,
+          }
+        }}
+      >
+        <CardMedia
+          component="img"
+          height="200"
+          image={service.image}
+          alt={service.name}
+        />
+        <CardContent>
+          {/* Header */}
+          <Box sx={{ mb: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 1 }}>
+              <Typography variant="h5" component="h3" fontWeight={600}>
+                {service.name}
+              </Typography>
+              <Chip 
+                label={service.priceRange} 
+                size="small" 
+                color="primary"
+              />
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Rating value={service.rating} precision={0.1} readOnly size="small" />
+              <Typography variant="body2" color="text.secondary">
+                {service.rating}
+              </Typography>
+            </Box>
+            <Chip 
+              label={service.category} 
+              size="small" 
+              variant="outlined"
+              sx={{ mr: 1 }}
+            />
+            {service.cuisine && (
+              <Chip 
+                label={service.cuisine} 
+                size="small" 
+                variant="outlined"
+              />
+            )}
+          </Box>
 
-  const showSnackbar = (message, severity = 'success') => {
-    setSnackbar({ open: true, message, severity });
-  };
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {service.description}
+          </Typography>
 
-  const handleOpenDialog = (service = null) => {
-    if (service) {
-      setEditingService(service);
-      setFormData({
-        name: service.name,
-        category: service.category,
-        subcategory: service.subcategory || '',
-        description: service.description,
-        location: service.location,
-        district: service.district || '',
-        address: service.address || '',
-        phone: service.phone || '',
-        email: service.email || '',
-        website: service.website || '',
-        priceRange: service.priceRange || '$$',
-        openHours: service.openHours || '',
-        features: Array.isArray(service.features) ? service.features.join(', ') : '',
-        specialties: Array.isArray(service.specialties) ? service.specialties.join(', ') : '',
-        amenities: Array.isArray(service.amenities) ? service.amenities.join(', ') : '',
-        services: Array.isArray(service.services) ? service.services.join(', ') : '',
-      });
-    } else {
-      setEditingService(null);
-      setFormData({
-        name: '',
-        category: 'restaurant',
-        subcategory: '',
-        description: '',
-        location: '',
-        district: '',
-        address: '',
-        phone: '',
-        email: '',
-        website: '',
-        priceRange: '$$',
-        openHours: '',
-        features: '',
-        specialties: '',
-        amenities: '',
-        services: '',
-      });
-    }
-    setImageFile(null);
-    setOpenDialog(true);
-  };
+          <Divider sx={{ my: 2 }} />
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setEditingService(null);
-    setImageFile(null);
-  };
+          {/* Highlights */}
+          {service.highlights && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                Highlights:
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                {service.highlights.map((highlight, idx) => (
+                  <Chip 
+                    key={idx}
+                    label={highlight}
+                    size="small"
+                    sx={{ fontSize: '0.75rem' }}
+                  />
+                ))}
+              </Box>
+            </Box>
+          )}
 
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+          {/* Amenities (for hotels) */}
+          {service.amenities && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                Amenities:
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                {service.amenities.map((amenity, idx) => (
+                  <Chip 
+                    key={idx}
+                    label={amenity}
+                    size="small"
+                    icon={<RoomService />}
+                    sx={{ fontSize: '0.75rem' }}
+                  />
+                ))}
+              </Box>
+            </Box>
+          )}
 
-  const handleImageChange = (e) => {
-    setImageFile(e.target.files[0]);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const submitData = new FormData();
-    Object.keys(formData).forEach(key => {
-      if (key === 'features' || key === 'specialties' || key === 'amenities' || key === 'services') {
-        const arrayValue = formData[key].split(',').map(item => item.trim()).filter(item => item);
-        submitData.append(key, JSON.stringify(arrayValue));
-      } else {
-        submitData.append(key, formData[key]);
-      }
-    });
-    
-    if (imageFile) {
-      submitData.append('image', imageFile);
-    }
-
-    try {
-      if (editingService) {
-        await api.put(`/local-services/${editingService.id}`, submitData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        showSnackbar('Service updated successfully!');
-      } else {
-        await api.post('/local-services', submitData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        showSnackbar('Service added successfully!');
-      }
-      handleCloseDialog();
-      fetchServices();
-    } catch (error) {
-      console.error('Error saving service:', error);
-      showSnackbar(error.response?.data?.message || 'Error saving service', 'error');
-    }
-  };
-
-  const handleDelete = async (serviceId) => {
-    if (window.confirm('Are you sure you want to delete this service?')) {
-      try {
-        await api.delete(`/local-services/${serviceId}`);
-        showSnackbar('Service deleted successfully!');
-        fetchServices();
-      } catch (error) {
-        console.error('Error deleting service:', error);
-        showSnackbar('Error deleting service', 'error');
-      }
-    }
-  };
-
-  const filteredServices = (services || []).filter(service =>
-    service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    service.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    service.location.toLowerCase().includes(searchTerm.toLowerCase())
+          {/* Contact Info */}
+          <List dense>
+            <ListItem disableGutters>
+              <ListItemIcon sx={{ minWidth: 36 }}>
+                <LocationOn fontSize="small" color="action" />
+              </ListItemIcon>
+              <ListItemText 
+                primary={service.location}
+                primaryTypographyProps={{ variant: 'body2' }}
+              />
+            </ListItem>
+            {service.phone && (
+              <ListItem disableGutters>
+                <ListItemIcon sx={{ minWidth: 36 }}>
+                  <Phone fontSize="small" color="action" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={service.phone}
+                  primaryTypographyProps={{ variant: 'body2' }}
+                />
+              </ListItem>
+            )}
+            {service.website && (
+              <ListItem disableGutters>
+                <ListItemIcon sx={{ minWidth: 36 }}>
+                  <WebIcon fontSize="small" color="action" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={service.website}
+                  primaryTypographyProps={{ variant: 'body2' }}
+                />
+              </ListItem>
+            )}
+          </List>
+        </CardContent>
+      </Card>
+    </Grid>
   );
-
-  const renderPriceRange = (priceRange) => {
-    const colors = { '$': 'success', '$$': 'warning', '$$$': 'error', '$$$$': 'error' };
-    return (
-      <Chip
-        label={priceRange}
-        size="small"
-        color={colors[priceRange] || 'default'}
-        icon={<MoneyIcon />}
-      />
-    );
-  };
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Page Header */}
-      <Box sx={{ textAlign: 'center', mb: 4 }}>
-        <Typography variant="h3" component="h1" gutterBottom color="primary">
-          Local Services
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 5 }}>
+        <Typography 
+          variant="h3" 
+          component="h1" 
+          gutterBottom
+          sx={{ 
+            fontWeight: 700,
+            background: 'linear-gradient(45deg, #2e7d32 30%, #66BB6A 90%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          Local Services & Recommendations
         </Typography>
         <Typography variant="h6" color="text.secondary">
-          Discover and share the best services in Sri Lanka
+          Trusted restaurants, hotels, and transport services in Sri Lanka
         </Typography>
       </Box>
 
-      {/* Add Service Button */}
-      {user && (
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => handleOpenDialog()}
-          >
-            Add Service
-          </Button>
-        </Box>
-      )}
-
-      {/* Search and Category Tabs */}
-      <Paper sx={{ mb: 4 }}>
-        <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-          <TextField
-            fullWidth
-            placeholder="Search services..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
-        
+      {/* Category Tabs */}
+      <Paper elevation={3} sx={{ mb: 4 }}>
         <Tabs
-          value={selectedCategory}
-          onChange={(event, newValue) => setSelectedCategory(newValue)}
+          value={selectedTab}
+          onChange={(e, newValue) => setSelectedTab(newValue)}
+          centered
           variant="fullWidth"
         >
-          {categories.map((category, index) => (
-            <Tab
+          {tabs.map((tab, index) => (
+            <Tab 
               key={index}
-              icon={category.icon}
-              label={category.label}
+              label={tab.label}
+              icon={tab.icon}
               iconPosition="start"
             />
           ))}
         </Tabs>
       </Paper>
 
-      {/* Service Cards */}
+      {/* Services Grid */}
       <Grid container spacing={3}>
-        {filteredServices.map((service) => (
-          <Grid item xs={12} md={6} key={service.id}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              {service.image && (
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={getImageUrl(service.image)}
-                  alt={service.name}
-                  sx={{ objectFit: 'cover' }}
-                />
-              )}
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
-                  <Typography variant="h6" component="h2">
-                    {service.name}
-                  </Typography>
-                  {service.priceRange && renderPriceRange(service.priceRange)}
-                </Box>
-
-                <Typography variant="subtitle2" color="primary" gutterBottom>
-                  {service.subcategory || service.category}
-                </Typography>
-
-                {service.rating > 0 && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Rating value={service.rating} precision={0.1} size="small" readOnly />
-                    <Typography variant="body2" sx={{ ml: 1 }}>
-                      {service.rating}
-                    </Typography>
-                  </Box>
-                )}
-
-                <Typography variant="body2" color="text.secondary" paragraph>
-                  {service.description}
-                </Typography>
-
-                <List dense>
-                  {service.location && (
-                    <ListItem sx={{ px: 0 }}>
-                      <ListItemIcon>
-                        <LocationIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText primary={service.location} secondary={service.district} />
-                    </ListItem>
-                  )}
-                  
-                  {service.phone && (
-                    <ListItem sx={{ px: 0 }}>
-                      <ListItemIcon>
-                        <PhoneIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText primary={service.phone} />
-                    </ListItem>
-                  )}
-                  
-                  {service.email && (
-                    <ListItem sx={{ px: 0 }}>
-                      <ListItemIcon>
-                        <EmailIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText primary={service.email} />
-                    </ListItem>
-                  )}
-                  
-                  {service.openHours && (
-                    <ListItem sx={{ px: 0 }}>
-                      <ListItemIcon>
-                        <ScheduleIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText primary={service.openHours} />
-                    </ListItem>
-                  )}
-                </List>
-
-                {/* Specialties/Services/Amenities */}
-                {service.specialties && service.specialties.length > 0 && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      Specialties:
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {service.specialties.map((specialty, index) => (
-                        <Chip key={index} label={specialty} size="small" />
-                      ))}
-                    </Box>
-                  </Box>
-                )}
-
-                {service.amenities && service.amenities.length > 0 && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      Amenities:
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {service.amenities.map((amenity, index) => (
-                        <Chip key={index} label={amenity} size="small" />
-                      ))}
-                    </Box>
-                  </Box>
-                )}
-
-                {service.features && service.features.length > 0 && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      Features:
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {service.features.map((feature, index) => (
-                        <Chip key={index} label={feature} size="small" variant="outlined" />
-                      ))}
-                    </Box>
-                  </Box>
-                )}
-
-                <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 2 }}>
-                  Added by {service.user?.username || 'User'}
-                </Typography>
-              </CardContent>
-
-              <Box sx={{ p: 2, pt: 0, display: 'flex', gap: 1 }}>
-                {service.phone && (
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    href={`tel:${service.phone}`}
-                    startIcon={<PhoneIcon />}
-                  >
-                    Contact
-                  </Button>
-                )}
-                {user && (user.id === service.userId || user.role === 'admin') && (
-                  <>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleOpenDialog(service)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDelete(service.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </>
-                )}
-              </Box>
-            </Card>
-          </Grid>
-        ))}
+        {currentServices.map(renderServiceCard)}
       </Grid>
 
-      {/* No Results */}
-      {!loading && filteredServices.length === 0 && (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            No services found
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {user ? 'Be the first to add a service!' : 'Try adjusting your search terms'}
-          </Typography>
-        </Paper>
-      )}
-
-      {/* Add/Edit Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>{editingService ? 'Edit Service' : 'Add New Service'}</DialogTitle>
-        <form onSubmit={handleSubmit}>
-          <DialogContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Service Name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth required>
-                  <InputLabel>Category</InputLabel>
-                  <Select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    label="Category"
-                  >
-                    <MenuItem value="restaurant">Restaurant</MenuItem>
-                    <MenuItem value="hotel">Hotel</MenuItem>
-                    <MenuItem value="transport">Transport</MenuItem>
-                    <MenuItem value="tour-operator">Tour Operator</MenuItem>
-                    <MenuItem value="other">Other</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Subcategory"
-                  name="subcategory"
-                  value={formData.subcategory}
-                  onChange={handleInputChange}
-                  placeholder="e.g., Italian, 5-Star, etc."
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Price Range</InputLabel>
-                  <Select
-                    name="priceRange"
-                    value={formData.priceRange}
-                    onChange={handleInputChange}
-                    label="Price Range"
-                  >
-                    <MenuItem value="$">$ - Budget</MenuItem>
-                    <MenuItem value="$$">$$ - Moderate</MenuItem>
-                    <MenuItem value="$$$">$$$ - Expensive</MenuItem>
-                    <MenuItem value="$$$$">$$$$ - Very Expensive</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={3}
-                  label="Description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Location"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="District"
-                  name="district"
-                  value={formData.district}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Website"
-                  name="website"
-                  value={formData.website}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Open Hours"
-                  name="openHours"
-                  value={formData.openHours}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 9:00 AM - 10:00 PM"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Specialties"
-                  name="specialties"
-                  value={formData.specialties}
-                  onChange={handleInputChange}
-                  placeholder="Comma-separated, e.g., Pizza, Pasta, Seafood"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Amenities"
-                  name="amenities"
-                  value={formData.amenities}
-                  onChange={handleInputChange}
-                  placeholder="Comma-separated, e.g., Pool, Spa, Gym"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Features"
-                  name="features"
-                  value={formData.features}
-                  onChange={handleInputChange}
-                  placeholder="Comma-separated, e.g., WiFi, Parking, AC"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  variant="outlined"
-                  component="label"
-                  fullWidth
-                >
-                  Upload Image
-                  <input
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                </Button>
-                {imageFile && (
-                  <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                    Selected: {imageFile.name}
-                  </Typography>
-                )}
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancel</Button>
-            <Button type="submit" variant="contained">
-              {editingService ? 'Update' : 'Add'} Service
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-
-      {/* Snackbar */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      >
-        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      {/* Info Note */}
+      <Paper elevation={1} sx={{ mt: 4, p: 3, bgcolor: '#f5f5f5' }}>
+        <Typography variant="body2" color="text.secondary">
+          <strong>Note:</strong> These are recommended services based on reputation and customer reviews. 
+          Always verify prices, availability, and current offerings before booking. Contact information 
+          and prices may change.
+        </Typography>
+      </Paper>
     </Container>
   );
 };
