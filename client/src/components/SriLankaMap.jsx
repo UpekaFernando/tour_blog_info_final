@@ -67,7 +67,7 @@ const SriLankaMap = () => {
   return (
     <>
       <Typography variant="h4" component="h2" textAlign="center" gutterBottom>
-        Explore Beautiful Sri Lanka by Districts
+        upeka fernando
       </Typography>
       <Typography variant="body1" textAlign="center" paragraph>
         Click on any district on the map to discover its unique attractions and destinations.
