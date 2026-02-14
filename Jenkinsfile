@@ -39,7 +39,7 @@ pipeline {
           script {
             echo "Building frontend Docker image..."
             sh """
-              docker build -f Dockerfile_frontend -t ${FRONTEND_IMAGE}:${IMAGE_TAG} -t ${FRONTEND_IMAGE}:latest .
+              docker build --build-arg VITE_API_URL=http://13.218.231.9:5000/api -f Dockerfile_frontend -t ${FRONTEND_IMAGE}:${IMAGE_TAG} -t ${FRONTEND_IMAGE}:latest .
             """
           }
         }
