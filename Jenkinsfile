@@ -194,30 +194,30 @@ docker rm tour-blog-backend tour-blog-frontend 2>/dev/null || true
 DB_HOST="tour-blog-db.c2fqs2k2ar64.us-east-1.rds.amazonaws.com"
 
 # Generate JWT secret
-JWT_SECRET="$(openssl rand -hex 32)"
+JWT_SECRET="\$(openssl rand -hex 32)"
 
 # Start backend
 echo "Starting backend container..."
-docker run -d \\\\
-  --name tour-blog-backend \\\\
-  --restart unless-stopped \\\\
-  -p 5000:5000 \\\\
-  -e NODE_ENV=production \\\\
-  -e DB_HOST="${DB_HOST}" \\\\
-  -e DB_PORT=3306 \\\\
-  -e DB_NAME=tour_blog \\\\
-  -e DB_USER=admin \\\\
-  -e DB_PASSWORD="${DB_PASSWORD}" \\\\
-  -e JWT_SECRET="${JWT_SECRET}" \\\\
+docker run -d \\
+  --name tour-blog-backend \\
+  --restart unless-stopped \\
+  -p 5000:5000 \\
+  -e NODE_ENV=production \\
+  -e DB_HOST="\${DB_HOST}" \\
+  -e DB_PORT=3306 \\
+  -e DB_NAME=tour_blog \\
+  -e DB_USER=admin \\
+  -e DB_PASSWORD="\${DB_PASSWORD}" \\
+  -e JWT_SECRET="\${JWT_SECRET}" \\
   upeka2002/tourblog-backend:latest
 
 # Start frontend
 echo "Starting frontend container..."
-docker run -d \\\\
-  --name tour-blog-frontend \\\\
-  --restart unless-stopped \\\\
-  -p 80:80 \\\\
-  -p 5173:80 \\\\
+docker run -d \\
+  --name tour-blog-frontend \\
+  --restart unless-stopped \\
+  -p 80:80 \\
+  -p 5173:80 \\
   upeka2002/tourblog-frontend:latest
 
 echo "=== Deployment Complete ==="
