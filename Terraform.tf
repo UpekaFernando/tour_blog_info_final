@@ -160,6 +160,10 @@ resource "aws_security_group" "ec2_sg" {
   tags = {
     Name = "${var.project_name}-ec2-sg"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_security_group" "rds_sg" {
@@ -206,6 +210,11 @@ resource "aws_key_pair" "ec2_key" {
   tags = {
     Name = "${var.project_name}-key"
   }
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [public_key]
+  }
 }
 
 resource "aws_instance" "backend" {
@@ -224,6 +233,16 @@ resource "aws_instance" "backend" {
 
   tags = {
     Name = "${var.project_name}-backend"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [
+      ami,
+      user_data,
+      key_name,
+      tags
+    ]
   }
 }
 

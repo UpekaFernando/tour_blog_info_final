@@ -5,6 +5,7 @@ pipeline {
     DOCKERHUB_REPO = "upeka2002"
     BACKEND_IMAGE = "${DOCKERHUB_REPO}/tourblog-backend"
     FRONTEND_IMAGE = "${DOCKERHUB_REPO}/tourblog-frontend"
+    TF_VERSION = "1.7.0"
   }
 
   stages {
@@ -64,16 +65,105 @@ pipeline {
         }
       }
     }
+
+    stage('Install Terraform') {
+      steps {
+        script {
+          echo "Checking for Terraform..."
+          def terraformExists = sh(script: "which terraform || echo 'not found'", returnStdout: true).trim()
+          
+          if (terraformExists.contains('not found')) {
+            echo "Installing Terraform ${TF_VERSION}..."
+            sh """
+              wget -q https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+              unzip -o terraform_${TF_VERSION}_linux_amd64.zip
+              sudo mv terraform /usr/local/bin/
+              rm terraform_${TF_VERSION}_linux_amd64.zip
+            """
+          }
+          
+          sh "terraform version"
+        }
+      }
+    }
+
+    stage('Terraform Init') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY'),
+          string(credentialsId: 'terraform-ssh-public-key', variable: 'TF_VAR_ssh_public_key'),
+          string(credentialsId: 'terraform-db-password', variable: 'TF_VAR_db_password')
+        ]) {
+          script {
+            echo "Initializing Terraform..."
+            sh """
+              terraform init -upgrade
+            """
+          }
+        }
+      }
+    }
+
+    stage('Terraform Plan') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY'),
+          string(credentialsId: 'terraform-ssh-public-key', variable: 'TF_VAR_ssh_public_key'),
+          string(credentialsId: 'terraform-db-password', variable: 'TF_VAR_db_password')
+        ]) {
+          script {
+            echo "Running Terraform plan (excluding EC2 instance)..."
+            sh """
+              terraform plan \
+                -target=aws_db_instance.mysql \
+                -target=aws_s3_bucket.frontend \
+                -target=aws_s3_bucket.deploy \
+                -target=aws_s3_bucket_website_configuration.frontend \
+                -target=aws_s3_bucket_policy.frontend_policy \
+                -target=aws_s3_bucket_public_access_block.frontend \
+                -out=tfplan
+            """
+          }
+        }
+      }
+    }
+
+    stage('Terraform Apply') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY'),
+          string(credentialsId: 'terraform-ssh-public-key', variable: 'TF_VAR_ssh_public_key'),
+          string(credentialsId: 'terraform-db-password', variable: 'TF_VAR_db_password')
+        ]) {
+          script {
+            echo "Applying Terraform changes (excluding EC2 instance)..."
+            sh """
+              terraform apply -auto-approve tfplan
+            """
+          }
+        }
+      }
+    }
   }
 
   post {
     success {
-      echo "✅ Images pushed successfully!"
+      echo "✅ Pipeline completed successfully!"
       echo "Backend: ${BACKEND_IMAGE}:${IMAGE_TAG}"
       echo "Frontend: ${FRONTEND_IMAGE}:${IMAGE_TAG}"
+      echo "Infrastructure: Updated via Terraform (RDS + S3)"
     }
     failure {
-      echo "❌ Build or push failed - check console output"
+      echo "❌ Pipeline failed - check console output"
+    }
+    always {
+      script {
+        // Clean up terraform plan file
+        sh "rm -f tfplan"
+      }
     }
   }
 }
