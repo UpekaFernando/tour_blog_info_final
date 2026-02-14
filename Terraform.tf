@@ -91,115 +91,38 @@ provider "aws" {
 }
 
 # ================================
-# Networking Resources
+# Networking Resources - Using Existing
 # ================================
 data "aws_vpc" "default" {
   default = true
 }
 
-resource "aws_subnet" "subnet_a" {
-  vpc_id                  = data.aws_vpc.default.id
-  cidr_block              = "172.31.48.0/20"
-  availability_zone       = "${var.aws_region}a"
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "${var.project_name}-subnet-a"
-  }
-}
-
-resource "aws_subnet" "subnet_b" {
-  vpc_id                  = data.aws_vpc.default.id
-  cidr_block              = "172.31.64.0/20"
-  availability_zone       = "${var.aws_region}b"
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "${var.project_name}-subnet-b"
+# Use existing subnets (no creation)
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
   }
 }
 
 # ================================
-# Security Groups
+# Security Groups - Using Existing
 # ================================
-resource "aws_security_group" "ec2_sg" {
-  name        = "${var.project_name}-ec2-sg"
-  description = "Security group for EC2 backend server"
-  vpc_id      = data.aws_vpc.default.id
-
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+# Reference existing security groups (no creation)
+data "aws_security_group" "ec2_sg" {
+  filter {
+    name   = "group-name"
+    values = ["tour-blog-backend-sg"]
   }
-
-  ingress {
-    description = "HTTP"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Backend API"
-    from_port   = 5000
-    to_port     = 5000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "All outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.project_name}-ec2-sg"
-  }
-
-  lifecycle {
-    prevent_destroy = true
-  }
+  vpc_id = data.aws_vpc.default.id
 }
 
-resource "aws_security_group" "rds_sg" {
-  name        = "${var.project_name}-rds-sg"
-  description = "Security group for RDS MySQL database"
-  vpc_id      = data.aws_vpc.default.id
-
-  ingress {
-    description     = "MySQL from EC2"
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.ec2_sg.id]
+data "aws_security_group" "rds_sg" {
+  filter {
+    name   = "group-name"
+    values = ["*rds*", "*database*", "tour-blog*"]
   }
-
-  ingress {
-    description = "MySQL from anywhere"
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "All outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.project_name}-rds-sg"
-  }
+  vpc_id = data.aws_vpc.default.id
 }
 
 # ================================
@@ -403,10 +326,10 @@ output "backend_api_url" {
 
 output "security_group_ec2_id" {
   description = "Security group ID for EC2 instance"
-  value       = aws_security_group.ec2_sg.id
+  value       = data.aws_security_group.ec2_sg.id
 }
 
 output "security_group_rds_id" {
   description = "Security group ID for RDS instance"
-  value       = aws_security_group.rds_sg.id
+  value       = data.aws_security_group.rds_sg.id
 }
