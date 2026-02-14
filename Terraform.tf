@@ -39,8 +39,9 @@ variable "ec2_instance_type" {
 }
 
 variable "ssh_public_key" {
-  description = "SSH public key for EC2 access"
+  description = "SSH public key for EC2 access (not used with existing infrastructure)"
   type        = string
+  default     = ""  # Not needed when using existing EC2
   sensitive   = true
 }
 
@@ -76,8 +77,9 @@ variable "db_username" {
 }
 
 variable "db_password" {
-  description = "Database admin password"
+  description = "Database admin password (not used with existing infrastructure)"
   type        = string
+  default     = ""  # Not needed when using existing RDS
   sensitive   = true
 }
 
