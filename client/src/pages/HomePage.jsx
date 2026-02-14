@@ -66,7 +66,7 @@ const HomePage = () => {
               textShadow: '2px 2px 6px rgba(0,0,0,0.7)'
             }}
           >
-            Discover Sri Lanka
+           lets  Discover Sri Lanka
           </Typography>
           <Typography 
             variant="h5" 
