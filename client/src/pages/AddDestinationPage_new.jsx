@@ -61,7 +61,7 @@ const AddDestinationPage = () => {
       try {
         const data = await getDistricts();
         setDistricts(data);
-      } catch (err) {
+      } catch {
         setError('Failed to fetch districts');
       }
     };
