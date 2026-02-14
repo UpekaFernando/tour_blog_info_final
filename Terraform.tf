@@ -108,21 +108,13 @@ data "aws_subnets" "default" {
 # ================================
 # Security Groups - Using Existing
 # ================================
-# Reference existing security groups (no creation)
+# Reference existing security groups by ID (no creation)
 data "aws_security_group" "ec2_sg" {
-  filter {
-    name   = "group-name"
-    values = ["tour-blog-backend-sg"]
-  }
-  vpc_id = data.aws_vpc.default.id
+  id = "sg-08d4c1991878c35be"  # tour-blog-backend-sg
 }
 
 data "aws_security_group" "rds_sg" {
-  filter {
-    name   = "group-name"
-    values = ["*rds*", "*database*", "tour-blog*"]
-  }
-  vpc_id = data.aws_vpc.default.id
+  id = "sg-096b0d9c71c78a4e8"  # default VPC security group used by RDS
 }
 
 # ================================

@@ -103,6 +103,22 @@ pipeline {
       }
     }
 
+    stage('Terraform State Cleanup') {
+      steps {
+        script {
+          echo "Cleaning up old resources from Terraform state..."
+          sh """
+            # Remove old security groups from state if they exist
+            terraform state rm aws_security_group.ec2_sg 2>/dev/null || echo "✓ ec2_sg not in state"
+            terraform state rm aws_security_group.rds_sg 2>/dev/null || echo "✓ rds_sg not in state"
+            
+            echo "Current state resources:"
+            terraform state list || echo "State is empty or not initialized"
+          """
+        }
+      }
+    }
+
     stage('Terraform Plan') {
       steps {
         withCredentials([
