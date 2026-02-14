@@ -46,3 +46,6 @@ Thumbs.db
 
 # MySQL data
 mysql_data/
+EC2_PROTECTION_GUIDE.md
+JENKINS_CREDENTIALS_SETUP.md
+SSH_KEY_PAIR_INFO.md

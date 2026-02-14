@@ -201,101 +201,46 @@ resource "aws_security_group" "rds_sg" {
 }
 
 # ================================
-# EC2 Resources
+# EC2 Resources - Using Existing Instance
 # ================================
-resource "aws_key_pair" "ec2_key" {
-  key_name   = "${var.project_name}-key"
-  public_key = var.ssh_public_key
+# Reference existing EC2 instance (do not create/destroy)
+data "aws_instance" "backend" {
+  instance_id = "i-0d803531ceb56a45b"  # Your existing instance
 
-  tags = {
-    Name = "${var.project_name}-key"
-  }
-
-  lifecycle {
-    prevent_destroy = true
-    ignore_changes = [public_key]
+  filter {
+    name   = "instance-state-name"
+    values = ["running", "stopped"]
   }
 }
 
-resource "aws_instance" "backend" {
-  ami                    = var.ec2_ami_id
-  instance_type          = var.ec2_instance_type
-  key_name               = aws_key_pair.ec2_key.key_name
-  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
-  subnet_id              = aws_subnet.subnet_a.id
-
-  user_data = templatefile("${path.module}/user-data-inline.sh", {
-    db_host     = aws_db_instance.mysql.address
-    db_user     = var.db_username
-    db_password = var.db_password
-    db_name     = var.db_name
-  })
-
-  tags = {
-    Name = "${var.project_name}-backend"
-  }
-
-  lifecycle {
-    prevent_destroy = true
-    ignore_changes = [
-      ami,
-      user_data,
-      key_name,
-      tags
-    ]
-  }
+# Reference existing key pair (do not create/destroy)
+data "aws_key_pair" "ec2_key" {
+  key_name = "tour-blog-key"  # Your existing key pair
 }
 
 # ================================
-# RDS Resources
+# RDS Resources - Using Existing Database
 # ================================
-resource "aws_db_subnet_group" "rds_subnet_group" {
-  name       = "${var.project_name}-rds-subnet-group"
-  subnet_ids = [aws_subnet.subnet_a.id, aws_subnet.subnet_b.id]
-
-  tags = {
-    Name = "${var.project_name}-rds-subnet-group"
-  }
-}
-
-resource "aws_db_instance" "mysql" {
-  identifier             = "${var.project_name}-db"
-  engine                 = "mysql"
-  engine_version         = var.db_engine_version
-  instance_class         = var.db_instance_class
-  allocated_storage      = var.db_allocated_storage
-  storage_type           = "gp2"
-  db_name                = var.db_name
-  username               = var.db_username
-  password               = var.db_password
-  db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
-  vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  publicly_accessible    = true
-  skip_final_snapshot    = true
-  backup_retention_period = 7
-
-  tags = {
-    Name = "${var.project_name}-mysql"
-  }
+# Reference existing RDS instance (do not create/destroy) 
+data "aws_db_instance" "mysql" {
+  db_instance_identifier = "tour-blog-db"  # Your existing RDS instance
 }
 
 # ================================
-# S3 Resources - Frontend Bucket
+# S3 Resources - Using Existing Buckets
 # ================================
-resource "aws_s3_bucket" "frontend" {
-  bucket = "${var.project_name}-frontend-${random_id.bucket_suffix.dec}"
-
-  tags = {
-    Name = "${var.project_name}-frontend"
-  }
+# Reference existing S3 buckets (do not create/destroy)
+data "aws_s3_bucket" "frontend" {
+  bucket = "tour-blog-frontend-295054972"  # Your existing frontend bucket
 }
 
-resource "random_id" "bucket_suffix" {
-  byte_length = 4
+data "aws_s3_bucket" "deploy" {
+  bucket = "tour-blog-deploy-446654353"  # Your existing deploy bucket
 }
 
+# Optionally manage website configuration for existing frontend bucket
 resource "aws_s3_bucket_website_configuration" "frontend" {
-  bucket = aws_s3_bucket.frontend.id
+  bucket = data.aws_s3_bucket.frontend.id
 
   index_document {
     suffix = "index.html"
@@ -307,7 +252,7 @@ resource "aws_s3_bucket_website_configuration" "frontend" {
 }
 
 resource "aws_s3_bucket_public_access_block" "frontend" {
-  bucket = aws_s3_bucket.frontend.id
+  bucket = data.aws_s3_bucket.frontend.id
 
   block_public_acls       = false
   block_public_policy     = false
@@ -316,7 +261,7 @@ resource "aws_s3_bucket_public_access_block" "frontend" {
 }
 
 resource "aws_s3_bucket_policy" "frontend_policy" {
-  bucket = aws_s3_bucket.frontend.id
+  bucket = data.aws_s3_bucket.frontend.id
 
   depends_on = [aws_s3_bucket_public_access_block.frontend]
 
@@ -328,21 +273,10 @@ resource "aws_s3_bucket_policy" "frontend_policy" {
         Effect    = "Allow"
         Principal = "*"
         Action    = "s3:GetObject"
-        Resource  = "${aws_s3_bucket.frontend.arn}/*"
+        Resource  = "${data.aws_s3_bucket.frontend.arn}/*"
       }
     ]
   })
-}
-
-# ================================
-# S3 Resources - Deploy Bucket
-# ================================
-resource "aws_s3_bucket" "deploy" {
-  bucket = "${var.project_name}-deploy-${random_id.bucket_suffix.dec}"
-
-  tags = {
-    Name = "${var.project_name}-deploy"
-  }
 }
 
 # ================================
@@ -417,52 +351,52 @@ resource "aws_s3_bucket" "deploy" {
 # ================================
 output "ec2_public_ip" {
   description = "Public IP address of the EC2 instance"
-  value       = aws_instance.backend.public_ip
+  value       = data.aws_instance.backend.public_ip
 }
 
 output "ec2_instance_id" {
   description = "EC2 instance ID"
-  value       = aws_instance.backend.id
+  value       = data.aws_instance.backend.id
 }
 
 output "ec2_ssh_command" {
   description = "SSH command to connect to EC2 instance"
-  value       = "ssh -i ${var.project_name}-key.pem ubuntu@${aws_instance.backend.public_ip}"
+  value       = "ssh -i ${data.aws_key_pair.ec2_key.key_name}.pem ubuntu@${data.aws_instance.backend.public_ip}"
 }
 
 output "rds_endpoint" {
   description = "RDS instance endpoint"
-  value       = aws_db_instance.mysql.endpoint
+  value       = data.aws_db_instance.mysql.endpoint
 }
 
 output "rds_address" {
   description = "RDS instance address"
-  value       = aws_db_instance.mysql.address
+  value       = data.aws_db_instance.mysql.address
 }
 
 output "database_name" {
   description = "Database name"
-  value       = aws_db_instance.mysql.db_name
+  value       = data.aws_db_instance.mysql.db_name
 }
 
 output "s3_frontend_bucket" {
   description = "S3 bucket name for frontend"
-  value       = aws_s3_bucket.frontend.bucket
+  value       = data.aws_s3_bucket.frontend.bucket
 }
 
 output "s3_frontend_url" {
   description = "S3 website endpoint URL"
-  value       = "http://${aws_s3_bucket.frontend.bucket}.s3-website-${var.aws_region}.amazonaws.com"
+  value       = "http://${data.aws_s3_bucket.frontend.bucket}.s3-website-${var.aws_region}.amazonaws.com"
 }
 
 output "s3_deploy_bucket" {
   description = "S3 bucket name for deployment files"
-  value       = aws_s3_bucket.deploy.bucket
+  value       = data.aws_s3_bucket.deploy.bucket
 }
 
 output "backend_api_url" {
   description = "Backend API URL"
-  value       = "http://${aws_instance.backend.public_ip}:5000/api"
+  value       = "http://${data.aws_instance.backend.public_ip}:5000/api"
 }
 
 output "security_group_ec2_id" {

@@ -26,7 +26,7 @@ pipeline {
           script {
             echo "Building backend Docker image..."
             sh """
-              docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} -t ${BACKEND_IMAGE}:latest .
+              docker build -f Dockerfile_backend -t ${BACKEND_IMAGE}:${IMAGE_TAG} -t ${BACKEND_IMAGE}:latest .
             """
           }
         }
@@ -39,7 +39,7 @@ pipeline {
           script {
             echo "Building frontend Docker image..."
             sh """
-              docker build -t ${FRONTEND_IMAGE}:${IMAGE_TAG} -t ${FRONTEND_IMAGE}:latest .
+              docker build -f Dockerfile_frontend -t ${FRONTEND_IMAGE}:${IMAGE_TAG} -t ${FRONTEND_IMAGE}:latest .
             """
           }
         }
@@ -91,9 +91,7 @@ pipeline {
       steps {
         withCredentials([
           string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
-          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY'),
-          string(credentialsId: 'terraform-ssh-public-key', variable: 'TF_VAR_ssh_public_key'),
-          string(credentialsId: 'terraform-db-password', variable: 'TF_VAR_db_password')
+          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
         ]) {
           script {
             echo "Initializing Terraform..."
@@ -109,21 +107,12 @@ pipeline {
       steps {
         withCredentials([
           string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
-          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY'),
-          string(credentialsId: 'terraform-ssh-public-key', variable: 'TF_VAR_ssh_public_key'),
-          string(credentialsId: 'terraform-db-password', variable: 'TF_VAR_db_password')
+          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
         ]) {
           script {
-            echo "Running Terraform plan (excluding EC2 instance)..."
+            echo "Running Terraform plan (using existing infrastructure)..."
             sh """
-              terraform plan \
-                -target=aws_db_instance.mysql \
-                -target=aws_s3_bucket.frontend \
-                -target=aws_s3_bucket.deploy \
-                -target=aws_s3_bucket_website_configuration.frontend \
-                -target=aws_s3_bucket_policy.frontend_policy \
-                -target=aws_s3_bucket_public_access_block.frontend \
-                -out=tfplan
+              terraform plan -out=tfplan
             """
           }
         }
@@ -134,12 +123,10 @@ pipeline {
       steps {
         withCredentials([
           string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
-          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY'),
-          string(credentialsId: 'terraform-ssh-public-key', variable: 'TF_VAR_ssh_public_key'),
-          string(credentialsId: 'terraform-db-password', variable: 'TF_VAR_db_password')
+          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
         ]) {
           script {
-            echo "Applying Terraform changes (excluding EC2 instance)..."
+            echo "Applying Terraform changes (S3 configuration only)..."
             sh """
               terraform apply -auto-approve tfplan
             """
