@@ -125,7 +125,7 @@ const ExplorePage = () => {
       {/* Page Header */}
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography variant="h3" component="h1" gutterBottom color="primary">
-          Explore Sri Lanka
+          Lets Explore Sri Lanka
         </Typography>
         <Typography variant="h6" color="text.secondary">
           Discover amazing destinations across the Pearl of the Indian Ocean
