@@ -30,8 +30,8 @@ coverage
 # ================================
 dist
 build
-uploads/*
-!uploads/.gitkeep
+# uploads/*
+# !uploads/.gitkeep
 
 # ================================
 # Frontend-Specific Exclusions
