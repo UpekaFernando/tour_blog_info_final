@@ -190,6 +190,11 @@ echo "Stopping old containers..."
 docker stop tour-blog-backend tour-blog-frontend 2>/dev/null || true
 docker rm tour-blog-backend tour-blog-frontend 2>/dev/null || true
 
+# Stop Nginx if running (frees port 80)
+echo "Stopping Nginx to free port 80..."
+sudo systemctl stop nginx 2>/dev/null || true
+sudo systemctl disable nginx 2>/dev/null || true
+
 # Use hardcoded RDS endpoint
 DB_HOST="tour-blog-db.c2fqs2k2ar64.us-east-1.rds.amazonaws.com"
 
