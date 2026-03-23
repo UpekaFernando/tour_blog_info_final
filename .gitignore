@@ -44,7 +44,13 @@ Thumbs.db
 # server/uploads/*
 # !server/uploads/.gitkeep
 
-# MySQL data
+# LaTeX auxiliary files
+*.aux
+*.out
+*.toc
+*.lot
+*.lof
+*.synctex.gz
 mysql_data/
 EC2_PROTECTION_GUIDE.md
 JENKINS_CREDENTIALS_SETUP.md
