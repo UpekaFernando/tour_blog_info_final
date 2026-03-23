@@ -1,0 +1,1399 @@
+\documentclass[12pt,a4paper]{report}
+
+% ─────────────────────────────────────────────
+%  Package imports
+% ─────────────────────────────────────────────
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2.5cm]{geometry}
+\setlength{\headheight}{14pt}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{parskip}
+\usepackage{microtype}
+\usepackage{float}
+
+% ─────────────────────────────────────────────
+%  Colour definitions
+% ─────────────────────────────────────────────
+\definecolor{primary}{HTML}{006064}
+\definecolor{accent}{HTML}{FF9800}
+\definecolor{codebg}{HTML}{F5F5F5}
+\definecolor{codecomment}{HTML}{546E7A}
+\definecolor{codekeyword}{HTML}{1565C0}
+\definecolor{codestring}{HTML}{2E7D32}
+
+% ─────────────────────────────────────────────
+%  Code listing style
+% ─────────────────────────────────────────────
+\lstdefinestyle{codestyle}{
+  backgroundcolor=\color{codebg},
+  commentstyle=\color{codecomment}\itshape,
+  keywordstyle=\color{codekeyword}\bfseries,
+  stringstyle=\color{codestring},
+  basicstyle=\ttfamily\small,
+  breakatwhitespace=false,
+  breaklines=true,
+  keepspaces=true,
+  numbers=left,
+  numbersep=8pt,
+  numberstyle=\tiny\color{gray},
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  frame=single,
+  rulecolor=\color{gray!30},
+  xleftmargin=1.5em,
+  xrightmargin=0.5em,
+}
+\lstset{style=codestyle}
+
+% ─────────────────────────────────────────────
+%  Header / footer
+% ─────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\color{primary}\small Tour Blog -- Technical Report}
+\fancyhead[R]{\color{primary}\small\nouppercase{\leftmark}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ─────────────────────────────────────────────
+%  Section title formatting
+% ─────────────────────────────────────────────
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{primary}}
+  {\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{primary}}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{primary!80}}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{primary!60}}{\thesubsubsection}{1em}{}
+
+% ─────────────────────────────────────────────
+%  Hyperlink colours
+% ─────────────────────────────────────────────
+\hypersetup{
+  colorlinks=true,
+  linkcolor=primary,
+  urlcolor=accent,
+  citecolor=primary,
+  pdftitle={Tour Blog - Technical Report},
+  pdfauthor={UpekaFernando},
+  pdfsubject={Sri Lanka Travel Blog Platform},
+}
+
+% ─────────────────────────────────────────────
+%  Document begins
+% ─────────────────────────────────────────────
+\begin{document}
+
+% ═══════════════════════════════════════════════
+%  TITLE PAGE
+% ═══════════════════════════════════════════════
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+  {\color{primary}\rule{\linewidth}{2pt}}\\[0.5cm]
+  {\Huge\bfseries\color{primary} Tour Blog}\\[0.3cm]
+  {\Large\color{accent} Sri Lanka Travel Information Platform}\\[0.2cm]
+  {\color{primary}\rule{\linewidth}{2pt}}\\[1.5cm]
+
+  {\large\bfseries Technical Report}\\[0.5cm]
+  {\normalsize A comprehensive explanation of every component\\
+   of the full-stack web application}\\[2cm]
+
+  \begin{tabular}{rl}
+    \textbf{Author:}      & UpekaFernando \\[4pt]
+    \textbf{Repository:}  & \texttt{UpekaFernando/tour\_blog\_info\_final} \\[4pt]
+    \textbf{Frontend:}    & React 18 + Vite + Material-UI \\[4pt]
+    \textbf{Backend:}     & Node.js + Express + Sequelize \\[4pt]
+    \textbf{Database:}    & MySQL 8.0 \\[4pt]
+    \textbf{DevOps:}      & Docker, Jenkins, Terraform, AWS \\[4pt]
+    \textbf{Date:}        & \today \\
+  \end{tabular}
+
+  \vfill
+  {\color{primary}\rule{\linewidth}{1pt}}\\
+  {\small This document was auto-generated from the project source code}
+\end{titlepage}
+
+% ═══════════════════════════════════════════════
+%  TABLE OF CONTENTS
+% ═══════════════════════════════════════════════
+\tableofcontents
+\newpage
+
+% ═══════════════════════════════════════════════
+% CHAPTER 1 — PROJECT OVERVIEW
+% ═══════════════════════════════════════════════
+\chapter{Project Overview}
+
+\section{Purpose and Goals}
+
+\textbf{Tour Blog} is a full-stack web application designed for exploring, sharing, and managing information about tourist destinations in \textbf{Sri Lanka}. The platform enables:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Destination Discovery} — Users can browse an interactive map and a curated list of Sri Lankan destinations organised by district.
+  \item \textbf{Community Contributions} — Authenticated users may add new destinations, post comments, and submit star ratings.
+  \item \textbf{Local Services Directory} — Hotels, restaurants, tour operators, and transport services are catalogued with pricing tiers and contact details.
+  \item \textbf{Travel Guides} — Step-by-step guides covering planning, budget travel, cultural etiquette, visa information, and emergency contacts.
+  \item \textbf{Weather Information} — Live weather data via an external API, helping visitors plan their trips.
+  \item \textbf{Photo Gallery} — A visual gallery of destination images uploaded by users.
+\end{itemize}
+
+\section{Technology Stack}
+
+Table~\ref{tab:stack} summarises the technologies used across every layer of the system.
+
+\begin{table}[H]
+  \centering
+  \caption{Technology stack}
+  \label{tab:stack}
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Layer} & \textbf{Technology} & \textbf{Version / Notes} \\
+    \midrule
+    Frontend framework    & React                & 18 (Vite build tool) \\
+    UI component library  & Material-UI (MUI)    & v7 \\
+    Routing               & React Router DOM     & v7 \\
+    HTTP client           & Axios                & v1.10 \\
+    Mapping               & Mapbox GL / react-map-gl & v3 / v8 \\
+    Styling               & Emotion + styled-components & v11 / v6 \\
+    Backend framework     & Express.js           & v4.18 \\
+    ORM                   & Sequelize            & v6.37 \\
+    Database              & MySQL                & 8.0 \\
+    Authentication        & JSON Web Tokens      & 9.0 \\
+    Password hashing      & bcryptjs             & 2.4 \\
+    File uploads          & Multer               & v2 \\
+    Containerisation      & Docker + Docker Compose & latest \\
+    Web server            & Nginx (Alpine)       & production frontend \\
+    CI/CD                 & Jenkins              & Declarative Pipeline \\
+    Infrastructure        & Terraform            & 1.7.0 \\
+    Cloud provider        & AWS (EC2, RDS, S3)   & us-east-1 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{High-Level Architecture}
+
+The application follows a \textbf{three-tier architecture}:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Presentation tier} — React Single-Page Application (SPA) served by Nginx inside a Docker container.
+  \item \textbf{Application tier} — Node.js/Express REST API server running in a separate Docker container, exposing endpoints on port \texttt{5000}.
+  \item \textbf{Data tier} — AWS RDS MySQL 8.0 instance (identifier \texttt{tour-blog-db}) storing all persistent data.
+\end{enumerate}
+
+Both Docker containers run on an AWS EC2 \texttt{t3.micro} instance. The frontend is also published as a static website to an \textbf{AWS S3 bucket} for high-availability access. A \textbf{Jenkins} CI/CD pipeline automates building, testing, and deploying new versions.
+
+\section{Repository Root Structure}
+
+\begin{lstlisting}[language=bash, caption={Top-level directory layout}]
+tour_blog_info_final/
+|-- client/                 # React frontend application
+|-- server/                 # Node.js/Express backend API
+|-- Terraform.tf            # AWS infrastructure definition
+|-- docker-compose.yml      # Local development orchestration
+|-- Jenkinsfile             # CI/CD pipeline definition
+|-- user-data-inline.sh     # EC2 bootstrap script
+|-- cleanup-terraform-state.sh  # Terraform state helper
+|-- .dockerignore           # Docker build exclusions
+|-- .gitignore              # Git exclusions
+|-- README.md               # Project readme
+\end{lstlisting}
+
+% ═══════════════════════════════════════════════
+% CHAPTER 2 — FRONTEND (CLIENT)
+% ═══════════════════════════════════════════════
+\chapter{Frontend Application (client/)}
+
+\section{Overview}
+
+The frontend is a \textbf{React 18 Single-Page Application} built with \textbf{Vite} as the build tool. It implements the complete user interface: navigation, destination browsing, user authentication, forms for adding/editing content, and an interactive Mapbox map of Sri Lanka.
+
+The \texttt{client/} directory contains all source code, configuration, and Docker/Nginx files needed to build and serve the frontend both in development and in production.
+
+\section{Key Configuration Files}
+
+\subsection{package.json --- Dependencies and Scripts}
+
+\texttt{package.json} declares every JavaScript dependency required by the frontend and defines the npm scripts used for development, building, and linting. Key entries:
+
+\begin{lstlisting}[language=bash, caption={Frontend npm scripts}]
+"dev":     "vite"              # Start Vite dev server (HMR)
+"build":   "vite build"        # Production bundle
+"lint":    "eslint ."          # Static code analysis
+"preview": "vite preview"      # Preview production build locally
+\end{lstlisting}
+
+Notable production dependencies include \texttt{react}, \texttt{react-dom}, \texttt{react-router-dom}, \texttt{@mui/material}, \texttt{axios}, \texttt{mapbox-gl}, and \texttt{react-map-gl}. The MUI icon package (\texttt{@mui/icons-material}) supplies the icon set used throughout the UI.
+
+\subsection{vite.config.js --- Build Tool Configuration}
+
+Vite is configured as the module bundler for the React application. The \texttt{@vitejs/plugin-react} plugin enables:
+\begin{itemize}[leftmargin=2em]
+  \item Fast Refresh (Hot Module Replacement) during development.
+  \item JSX transformation without manual React imports.
+  \item Optimised production bundles via Rollup under the hood.
+\end{itemize}
+
+\subsection{.env and .env.production --- Environment Variables}
+
+Runtime configuration is separated from code using environment files. Vite exposes only variables prefixed with \texttt{VITE\_} to the browser bundle.
+
+\begin{lstlisting}[caption={Example .env settings}]
+VITE_API_URL=http://localhost:5000/api   # Backend API base URL
+\end{lstlisting}
+
+In production (built by Jenkins or Docker), \texttt{VITE\_API\_URL} is overridden via a build argument to point at the AWS EC2 instance: \texttt{http://<EC2_PUBLIC_IP>:5000/api}.
+
+\subsection{eslint.config.js --- Code Quality}
+
+ESLint is configured with the React plugin and React Hooks plugin to enforce consistent code style, catch common React mistakes (e.g.\ missing dependency arrays in \texttt{useEffect}), and prevent common accessibility problems.
+
+\section{Dockerfile\_frontend --- Multi-Stage Docker Build}
+
+The frontend Docker image uses a \textbf{two-stage build} to keep the final image small (only Nginx and compiled static files are shipped):
+
+\begin{lstlisting}[caption={Multi-stage Dockerfile\_frontend logic}]
+# Stage 1 -- Builder
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+ARG VITE_API_URL          # Injected at build time by Jenkins
+ENV VITE_API_URL=$VITE_API_URL
+RUN npm run build          # Outputs to /app/dist
+
+# Stage 2 -- Production server
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+\end{lstlisting}
+
+\textbf{Why multi-stage?} The \texttt{node:18-alpine} image (\textasciitilde{}300\,MB) is only needed to compile the app. The final \texttt{nginx:alpine} image is under 30\,MB and serves the compiled static files.
+
+\section{nginx.conf --- Production Web Server}
+
+The Nginx configuration is tuned for a React SPA with the following important directives:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{try\_files \$uri \$uri/ /index.html} — Ensures all client-side routes fall back to \texttt{index.html} so React Router can handle navigation without 404 errors.
+  \item \textbf{Gzip compression} (\texttt{gzip on}) — Reduces transfer sizes for HTML, CSS, and JavaScript files.
+  \item \textbf{Cache headers} — Hashed asset filenames receive a 1-year \texttt{Cache-Control: max-age} for optimal browser caching.
+  \item \textbf{Security headers} — \texttt{X-Frame-Options: SAMEORIGIN}, \texttt{X-Content-Type-Options: nosniff}, and \texttt{X-XSS-Protection} harden the frontend against common attacks.
+\end{itemize}
+
+\section{Source Code Structure (src/)}
+
+\begin{lstlisting}[language=bash, caption={Frontend source layout}]
+src/
+|-- App.jsx            # Root component: theme + routing
+|-- main.jsx           # ReactDOM.render entry point
+|-- App.css / index.css
+|-- components/
+|   |-- Header.jsx
+|   |-- Footer.jsx
+|   |-- DestinationCard.jsx
+|   `-- SriLankaMap.jsx
+|-- pages/             # 16 page-level components
+|-- context/
+|   `-- AuthContext.jsx
+`-- utils/
+    `-- api.js
+\end{lstlisting}
+
+\subsection{main.jsx --- Entry Point}
+
+\texttt{main.jsx} is the first file executed by Vite. It mounts the React application tree into the \texttt{\#root} DOM element declared in \texttt{index.html}:
+
+\begin{lstlisting}[language=Java, caption={main.jsx}]
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+\end{lstlisting}
+
+\texttt{React.StrictMode} activates additional runtime warnings during development (double-invocation of certain lifecycle methods) without affecting production behaviour.
+
+\subsection{App.jsx --- Application Root}
+
+\texttt{App.jsx} is the highest-level React component. It performs three responsibilities:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Theme definition} — A custom MUI theme applies the brand colours (dark cyan \texttt{\#006064} as primary, orange \texttt{\#FF9800} as secondary) site-wide.
+  \item \textbf{Authentication context} — Wraps the entire tree in \texttt{<AuthProvider>} so all descendant components can access login state.
+  \item \textbf{Route definitions} — Uses \texttt{react-router-dom}'s \texttt{<BrowserRouter>} and \texttt{<Routes>} to declare all 16 routes of the application.
+\end{enumerate}
+
+\begin{lstlisting}[language=Java, caption={Simplified App.jsx routing structure}]
+<BrowserRouter>
+  <AuthProvider>
+    <ThemeProvider theme={theme}>
+      <Header />
+      <Routes>
+        <Route path="/"              element={<HomePage />} />
+        <Route path="/explore"       element={<ExplorePage />} />
+        <Route path="/destinations/:id" element={<DestinationPage />} />
+        <Route path="/district/:id"  element={<DistrictPage />} />
+        <Route path="/add"           element={<AddDestinationPage />} />
+        <Route path="/edit/:id"      element={<EditDestinationPage />} />
+        <Route path="/login"         element={<LoginPage />} />
+        <Route path="/register"      element={<RegisterPage />} />
+        <Route path="/profile"       element={<ProfilePage />} />
+        <Route path="/guides"        element={<TravelGuidePage />} />
+        <Route path="/gallery"       element={<PhotoGalleryPage />} />
+        <Route path="/services"      element={<LocalServicesPage />} />
+        <Route path="/weather"       element={<WeatherClimatePage />} />
+        <Route path="/about"         element={<AboutPage />} />
+        <Route path="/destinations"  element={<AllDestinationsPage />} />
+        <Route path="*"              element={<NotFoundPage />} />
+      </Routes>
+      <Footer />
+    </ThemeProvider>
+  </AuthProvider>
+</BrowserRouter>
+\end{lstlisting}
+
+\subsection{AuthContext.jsx --- Authentication State Management}
+
+\texttt{AuthContext} implements the React Context API to share authentication state across the entire component tree without prop drilling.
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{State} — \texttt{currentUser} (user object or \texttt{null}), \texttt{isAuthenticated} (boolean), \texttt{loading} (boolean during initial check).
+  \item \textbf{Persistence} — On mount, the context reads the JWT token and user object from \texttt{localStorage} to restore sessions after a page refresh.
+  \item \textbf{\texttt{login(userData, token)}} — Stores the user and token in both React state and \texttt{localStorage}.
+  \item \textbf{\texttt{logout()}} — Clears \texttt{localStorage} and resets state.
+  \item \textbf{\texttt{updateUser(userData)}} — Allows the profile page to update the cached user object without re-login.
+\end{itemize}
+
+Any component that needs the current user can call \texttt{useContext(AuthContext)} (or the custom \texttt{useAuth()} hook).
+
+\subsection{utils/api.js --- API Service Layer}
+
+All communication with the backend is centralised in \texttt{api.js}. This prevents scattered \texttt{axios.get(...)} calls across components and makes it easy to change the base URL.
+
+\begin{lstlisting}[language=Java, caption={api.js -- Axios instance and helper}]
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+const api = axios.create({ baseURL: API_URL });
+
+// Attach JWT token to every request automatically
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// Generic helpers
+export const get  = (url, params) => api.get(url, { params });
+export const post = (url, data)   => api.post(url, data);
+
+// Domain-specific helpers
+export const getDestinations    = ()     => get('/destinations');
+export const getDestinationById = (id)   => get(`/destinations/${id}`);
+export const createDestination  = (data) => post('/destinations', data);
+export const loginUser          = (data) => post('/users/login', data);
+export const registerUser       = (data) => post('/users', data);
+// ... and many more
+\end{lstlisting}
+
+The Axios request interceptor automatically injects the \texttt{Authorization: Bearer <token>} header on every outgoing request if a token is found in \texttt{localStorage}, so protected API calls require no special handling at the call-site.
+
+\section{Page Components (pages/)}
+
+The application contains \textbf{16 page-level components}. Each page is a React function component rendered when the corresponding route is matched.
+
+\begin{longtable}{lp{9cm}}
+  \toprule
+  \textbf{File} & \textbf{Description} \\
+  \midrule
+  \texttt{HomePage.jsx} & Landing page with hero banner, featured destinations, and call-to-action buttons. \\
+  \texttt{ExplorePage.jsx} & District-based browsing with filter controls; lists all 25 Sri Lankan districts. \\
+  \texttt{DestinationPage.jsx} & Detailed view of a single destination: images, description, comments, ratings, and location map. \\
+  \texttt{DistrictPage.jsx} & Shows all destinations within a selected district with a district map. \\
+  \texttt{AddDestinationPage.jsx} & Multi-field form (title, description, images, coordinates, best time, tips) for authenticated users to add new destinations. \\
+  \texttt{EditDestinationPage.jsx} & Pre-filled form allowing destination authors to update or delete their entries. \\
+  \texttt{LoginPage.jsx} & Email/password login form with error feedback; redirects on success. \\
+  \texttt{RegisterPage.jsx} & Registration form (name, email, password); validates and calls \texttt{registerUser()}. \\
+  \texttt{ProfilePage.jsx} & Displays user info, allows updating name/password/profile picture. \\
+  \texttt{TravelGuidePage.jsx} & Lists travel guides categorised by topic (planning, budget, visa, safety, etc.). \\
+  \texttt{PhotoGalleryPage.jsx} & Masonry-style gallery of all destination images. \\
+  \texttt{LocalServicesPage.jsx} & Directory of local services filterable by category (restaurant, hotel, transport, tour operator). \\
+  \texttt{WeatherClimatePage.jsx} & Displays real-time weather data for Sri Lankan cities. \\
+  \texttt{AboutPage.jsx} & Static information page about the platform. \\
+  \texttt{AllDestinationsPage.jsx} & Paginated list of all destinations with search and sort. \\
+  \texttt{NotFoundPage.jsx} & 404 error page shown for unrecognised routes. \\
+  \bottomrule
+\end{longtable}
+
+\section{Shared Components (components/)}
+
+\subsection{Header.jsx}
+
+The navigation bar renders differently based on screen size (responsive) and authentication state:
+
+\begin{itemize}[leftmargin=2em]
+  \item On \textbf{desktop}, a horizontal menu bar shows all primary navigation links.
+  \item On \textbf{mobile}, a hamburger button opens a slide-in drawer with the same links.
+  \item When a user is \textbf{logged in}, an avatar/profile menu is shown with options to view the profile or log out.
+  \item When \textbf{logged out}, Login and Register buttons are displayed.
+\end{itemize}
+
+\subsection{Footer.jsx}
+
+A simple site footer with links to key sections, social media icons (from MUI icons), and copyright information.
+
+\subsection{DestinationCard.jsx}
+
+A reusable MUI Card component that displays a destination's thumbnail image, title, district, short description, and a link to the full destination page. Used in \texttt{ExplorePage} and \texttt{AllDestinationsPage}.
+
+\subsection{SriLankaMap.jsx}
+
+An interactive map powered by \texttt{mapbox-gl} via the \texttt{react-map-gl} React wrapper. It:
+\begin{itemize}[leftmargin=2em]
+  \item Renders a styled base map centred on Sri Lanka.
+  \item Plots markers for each destination using the latitude/longitude from the database.
+  \item Shows a popup with the destination name and a link on marker click.
+\end{itemize}
+
+% ═══════════════════════════════════════════════
+% CHAPTER 3 — BACKEND SERVER (server/)
+% ═══════════════════════════════════════════════
+\chapter{Backend Server (server/)}
+
+\section{Overview}
+
+The backend is a \textbf{Node.js / Express.js} REST API that handles all business logic, data persistence, authentication, and file uploads. It follows the classic \textbf{MVC (Model-View-Controller)} pattern adapted for a REST API: Models define data structure and database interaction; Controllers contain business logic; Routes map HTTP endpoints to controller functions.
+
+The server listens on port \textbf{5000} and exposes all endpoints under the \texttt{/api} prefix.
+
+\section{server.js --- Application Entry Point}
+
+\texttt{server.js} bootstraps the entire backend application. Its responsibilities are:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Load environment variables} — \texttt{dotenv.config()} reads \texttt{.env} before anything else, making database credentials and the JWT secret available via \texttt{process.env}.
+  \item \textbf{Create Express app} — Initialises Express and registers global middleware.
+  \item \textbf{CORS configuration} — Allows cross-origin requests from any origin (\texttt{origin: '*'}) during development, with credentials enabled. This is necessary because the frontend and backend run on different origins (ports or domains).
+  \item \textbf{Body parsing} — \texttt{express.json()} and \texttt{express.urlencoded()} parse incoming JSON and form-encoded request bodies.
+  \item \textbf{Cache-Control headers} — A custom middleware adds \texttt{no-store, no-cache} headers to all \texttt{/api} responses, preventing browsers from caching API responses and serving stale data.
+  \item \textbf{Static file serving} — \texttt{express.static('uploads')} makes the \texttt{/uploads} directory publicly accessible so the frontend can display user-uploaded images.
+  \item \textbf{Route mounting} — Each feature area has its own router mounted at a sub-path (e.g.\ \texttt{/api/users}, \texttt{/api/destinations}).
+  \item \textbf{Database connection with retry} — Connects to MySQL using Sequelize with up to 3 retries and a 5-second backoff. If the database is unavailable, the server still starts and returns errors on database-dependent routes.
+  \item \textbf{Server startup} — \texttt{app.listen(PORT)} starts the HTTP server on the configured port.
+\end{enumerate}
+
+\begin{lstlisting}[language=Java, caption={server.js -- Startup sequence (simplified)}]
+const app = express();
+
+// Middleware
+app.use(cors({ origin: '*', credentials: true }));
+app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Routes
+app.use('/api/users',         userRoutes);
+app.use('/api/destinations',  destinationRoutes);
+app.use('/api/districts',     districtRoutes);
+app.use('/api/comments',      commentRoutes);
+app.use('/api/ratings',       ratingRoutes);
+app.use('/api/local-services',localServiceRoutes);
+app.use('/api/travel-guides', travelGuideRoutes);
+app.use('/api/weather',       weatherRoutes);
+
+// Start server
+connectDB().then(() => {
+  app.listen(5000, () => console.log('Server running on port 5000'));
+});
+\end{lstlisting}
+
+\section{config/database.js --- Database Configuration}
+
+This module exports a configured \texttt{Sequelize} instance that connects to MySQL using credentials from environment variables:
+
+\begin{lstlisting}[language=Java, caption={config/database.js}]
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host:    process.env.DB_HOST,
+    dialect: 'mysql',
+    port:    process.env.DB_PORT || 3306,
+    logging: false,              // Suppress SQL logs in production
+    pool: {
+      max: 10,  min: 0,
+      acquire: 30000,
+      idle: 10000
+    }
+  }
+);
+\end{lstlisting}
+
+The \textbf{connection pool} allows multiple simultaneous database queries without opening a new connection for every request, improving performance under load.
+
+\section{Database Models (models/)}
+
+Sequelize models define the database schema using JavaScript classes. Each model maps to a MySQL table. The \texttt{models/index.js} file imports all models and defines the \textbf{associations (relationships)} between them.
+
+\subsection{User Model}
+
+The \texttt{User} model stores account information and handles password security:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Fields:} \texttt{name} (STRING), \texttt{email} (STRING, unique), \texttt{password} (STRING), \texttt{profilePicture} (STRING, nullable), \texttt{isAdmin} (BOOLEAN, default false).
+  \item \textbf{Password hashing hooks:} A \texttt{beforeCreate} and \texttt{beforeUpdate} Sequelize lifecycle hook automatically hashes the password using \texttt{bcryptjs} with 10 salt rounds whenever a user is created or their password is changed. This means the plain-text password is \emph{never} stored in the database.
+  \item \textbf{matchPassword()} — An instance method that compares a plain-text candidate password against the stored hash using \texttt{bcryptjs.compare()}, used during login.
+\end{itemize}
+
+\subsection{District Model}
+
+Represents the 25 districts of Sri Lanka:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Fields:} \texttt{name} (STRING, unique), \texttt{description} (TEXT), \texttt{mapCoordinates} (JSON --- lat/lng bounds), \texttt{imageUrl} (STRING), \texttt{province} (STRING).
+  \item Districts are the top-level geographical grouping. Each district can contain many destinations.
+\end{itemize}
+
+\subsection{Destination Model}
+
+The core entity of the application:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Fields:} \texttt{title}, \texttt{description} (TEXT), \texttt{images} (JSON array of file paths), \texttt{location} (JSON with \texttt{lat}/\texttt{lng}), \texttt{bestTimeToVisit} (STRING), \texttt{travelTips} (TEXT).
+  \item \textbf{Foreign keys:} \texttt{districtId} (belongs to District, CASCADE delete --- if the district is deleted, all its destinations are deleted too), \texttt{authorId} (belongs to User).
+  \item Images are stored as an array of file paths, allowing multiple photos per destination.
+\end{itemize}
+
+\subsection{Comment Model}
+
+Stores user comments on destinations:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Fields:} \texttt{content} (TEXT, required).
+  \item \textbf{Relations:} belongs to \texttt{User} and \texttt{Destination}. If the parent destination is deleted, all its comments are deleted (CASCADE).
+\end{itemize}
+
+\subsection{Rating Model}
+
+Stores 1--5 star ratings submitted by users for destinations:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Fields:} \texttt{value} (INTEGER, validated: min 1, max 5).
+  \item A user can rate the same destination only once (unique constraint on \texttt{userId + destinationId}).
+\end{itemize}
+
+\subsection{LocalService Model}
+
+A rich model for the local services directory:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{category ENUM:} \texttt{restaurant | hotel | transport | tour-operator | other}.
+  \item \textbf{priceRange ENUM:} \texttt{\$ | \$\$ | \$\$\$ | \$\$\$\$} (budget to luxury).
+  \item \textbf{JSON arrays:} \texttt{features}, \texttt{specialties}, \texttt{amenities}, \texttt{services} allow rich structured data without needing separate join tables.
+  \item \textbf{isVerified} flag to distinguish officially verified listings from user-submitted ones.
+\end{itemize}
+
+\subsection{TravelGuide Model}
+
+Stores user-contributed and official travel guides:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{category ENUM:} \texttt{planning | transport | budget | cultural | safety | visa | emergency | language | other}.
+  \item \textbf{JSON tags} array for flexible tagging.
+  \item \textbf{viewCount / helpfulCount} counters to surface the most useful guides.
+  \item \textbf{isOfficial / isVerified} flags to distinguish platform-curated content from community submissions.
+\end{itemize}
+
+\subsection{Model Relationships}
+
+\begin{lstlisting}[language=Java, caption={models/index.js -- Association definitions}]
+// District -> Destination: one district has many destinations
+District.hasMany(Destination,   { foreignKey: 'districtId',  onDelete: 'CASCADE' });
+Destination.belongsTo(District, { foreignKey: 'districtId' });
+
+// User -> Destination: a user can author many destinations
+User.hasMany(Destination,        { foreignKey: 'authorId', as: 'destinations' });
+Destination.belongsTo(User,      { foreignKey: 'authorId', as: 'author' });
+
+// User/Destination -> Comments
+User.hasMany(Comment,            { foreignKey: 'userId' });
+Destination.hasMany(Comment,     { foreignKey: 'destinationId', onDelete: 'CASCADE' });
+Comment.belongsTo(User,          { foreignKey: 'userId' });
+Comment.belongsTo(Destination,   { foreignKey: 'destinationId' });
+
+// User/Destination -> Ratings
+User.hasMany(Rating,             { foreignKey: 'userId' });
+Destination.hasMany(Rating,      { foreignKey: 'destinationId', onDelete: 'CASCADE' });
+
+// User -> LocalServices
+User.hasMany(LocalService,       { foreignKey: 'userId' });
+
+// User -> TravelGuides
+User.hasMany(TravelGuide,        { foreignKey: 'userId', as: 'guides' });
+\end{lstlisting}
+
+\section{Controllers (controllers/)}
+
+Controllers contain the business logic for each feature area. They receive \texttt{(req, res)} from Express routes, interact with Sequelize models, and send back JSON responses.
+
+\subsection{userController.js}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{registerUser} — Validates email uniqueness, creates a User record (password is hashed automatically by the model hook), returns the new user and a JWT token.
+  \item \textbf{loginUser} — Finds user by email, calls \texttt{matchPassword()} to verify the password, returns user data and a signed JWT (30-day expiry).
+  \item \textbf{getUserProfile} — Returns the authenticated user's profile (protected by \texttt{authMiddleware}).
+  \item \textbf{updateUserProfile} — Allows updating name, password, and profile picture (file upload handled by Multer middleware).
+\end{itemize}
+
+\subsection{destinationController.js}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{getDestinations} — Returns all destinations with associated District and author User data (eager loading with Sequelize's \texttt{include}). Supports filtering by \texttt{districtId} query parameter.
+  \item \textbf{getDestinationById} — Returns a single destination with its comments (including commenter name), average rating, and associated district.
+  \item \textbf{createDestination} — Creates a new destination. Images are saved to disk by Multer and their paths stored as a JSON array.
+  \item \textbf{updateDestination} — Updates an existing destination; checks that the requester is the author or an admin.
+  \item \textbf{deleteDestination} — Deletes a destination and cascades to comments and ratings.
+  \item \textbf{removeDestinationImage} — Removes a single image from a destination's images array by index.
+\end{itemize}
+
+\subsection{districtController.js}
+
+Provides simple read operations for the District table: list all districts and retrieve a single district by ID (including associated destinations).
+
+\subsection{commentController.js}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{addComment} — Authenticated users can post a comment on a destination.
+  \item \textbf{updateComment} — Users can edit their own comments.
+  \item \textbf{deleteComment} — Users can delete their own comments (admins can delete any comment).
+  \item \textbf{getCommentsByDestination} — Retrieves all comments for a destination, including the author's name and profile picture.
+\end{itemize}
+
+\subsection{ratingController.js}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{submitRating} — Creates or updates the authenticated user's rating for a destination (upsert behaviour).
+  \item \textbf{getAverageRating} — Computes and returns the average rating for a destination.
+\end{itemize}
+
+\subsection{localServiceController.js}
+
+Full CRUD for the local services directory. Supports rich filtering: by category, by district, by price range, and free-text search.
+
+\subsection{travelGuideController.js}
+
+Full CRUD for travel guides. Supports filtering by category, sorting by view count or helpful count, and incrementing the \texttt{viewCount} when a guide is read.
+
+\subsection{weatherController.js}
+
+Delegates to \texttt{weatherService.js} to fetch live weather data and returns it to the frontend. Caches results to avoid excessive external API calls.
+
+\section{Routes (routes/)}
+
+Route files use Express Router to define HTTP method + path pairs and connect them to controller functions. Some routes apply the \texttt{authMiddleware} and/or \texttt{uploadMiddleware}.
+
+\begin{table}[H]
+  \centering
+  \caption{Key API endpoints}
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Method + Path} & \textbf{Controller function} & \textbf{Auth?} \\
+    \midrule
+    POST /api/users             & registerUser          & No \\
+    POST /api/users/login       & loginUser             & No \\
+    GET  /api/users/profile     & getUserProfile        & Yes \\
+    PUT  /api/users/profile     & updateUserProfile     & Yes + Upload \\
+    GET  /api/destinations      & getDestinations       & No \\
+    GET  /api/destinations/:id  & getDestinationById    & No \\
+    POST /api/destinations      & createDestination     & Yes + Upload \\
+    PUT  /api/destinations/:id  & updateDestination     & Yes \\
+    DELETE /api/destinations/:id& deleteDestination     & Yes \\
+    GET  /api/districts         & getAllDistricts        & No \\
+    GET  /api/districts/:id     & getDistrictById       & No \\
+    POST /api/comments          & addComment            & Yes \\
+    PUT  /api/comments/:id      & updateComment         & Yes \\
+    DELETE /api/comments/:id    & deleteComment         & Yes \\
+    POST /api/ratings           & submitRating          & Yes \\
+    GET  /api/local-services    & getLocalServices      & No \\
+    GET  /api/travel-guides     & getTravelGuides       & No \\
+    GET  /api/weather/:city     & getWeather            & No \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Middleware (middleware/)}
+
+\subsection{authMiddleware.js --- JWT Verification}
+
+This middleware protects routes that require a logged-in user:
+
+\begin{lstlisting}[language=Java, caption={authMiddleware.js}]
+const protect = async (req, res, next) => {
+  let token;
+  if (req.headers.authorization?.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+  if (!token) {
+    return res.status(401).json({ message: 'Not authorised, no token' });
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findByPk(decoded.id,
+                  { attributes: { exclude: ['password'] } });
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Not authorised, token failed' });
+  }
+};
+\end{lstlisting}
+
+The middleware reads the token from the \texttt{Authorization} header, verifies it against the \texttt{JWT\_SECRET} environment variable, and attaches the decoded user object to \texttt{req.user} so downstream controllers can access it.
+
+\subsection{uploadMiddleware.js --- File Upload Handling}
+
+Built on \textbf{Multer}, this middleware handles multipart/form-data file uploads:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Storage} — Files are saved to the \texttt{server/uploads/} directory with a unique timestamp-based filename to prevent collisions.
+  \item \textbf{File filter} — Only image MIME types (\texttt{image/jpeg}, \texttt{image/png}, \texttt{image/gif}, \texttt{image/webp}) are accepted; other file types are rejected with a 400 error.
+  \item \textbf{Size limit} — Individual files are capped at 5\,MB.
+  \item Two upload configurations are exported: \texttt{uploadSingle} (profile pictures) and \texttt{uploadMultiple} (up to 10 destination images).
+\end{itemize}
+
+\section{services/weatherService.js --- External Weather Integration}
+
+\texttt{weatherService.js} encapsulates all interaction with the external weather API (e.g.\ OpenWeatherMap). It:
+\begin{itemize}[leftmargin=2em]
+  \item Constructs API requests with the city name and API key (from environment variables).
+  \item Normalises the API response into a consistent internal format.
+  \item Implements a simple in-memory cache to avoid repeated API calls for the same city within a short window.
+\end{itemize}
+
+\section{Dockerfile\_backend}
+
+\begin{lstlisting}[caption={Backend Dockerfile (simplified)}]
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production   # Only production dependencies
+COPY . .
+RUN mkdir -p uploads            # Ensure uploads directory exists
+EXPOSE 5000
+HEALTHCHECK --interval=30s --timeout=10s \
+  CMD wget -qO- http://localhost:5000/api/test || exit 1
+CMD ["node", "server.js"]
+\end{lstlisting}
+
+The \texttt{HEALTHCHECK} directive allows Docker (and Docker Compose) to detect if the backend has crashed or become unresponsive and restart it automatically.
+
+% ═══════════════════════════════════════════════
+% CHAPTER 4 — DATABASE
+% ═══════════════════════════════════════════════
+\chapter{Database Design}
+
+\section{Overview}
+
+The application uses \textbf{MySQL 8.0} hosted on AWS RDS. The schema is managed by \textbf{Sequelize ORM}, which synchronises the JavaScript model definitions to the database tables. The database name is \texttt{tour\_blog}.
+
+\section{Entity-Relationship Summary}
+
+Figure description (textual ER diagram):
+
+\begin{lstlisting}[caption={Textual ER diagram}]
+[User] ---1:N---> [Destination]  (authorId)
+[User] ---1:N---> [Comment]      (userId)
+[User] ---1:N---> [Rating]       (userId)
+[User] ---1:N---> [LocalService] (userId)
+[User] ---1:N---> [TravelGuide]  (userId)
+
+[District] ---1:N---> [Destination]  (districtId, CASCADE)
+
+[Destination] ---1:N---> [Comment] (destinationId, CASCADE)
+[Destination] ---1:N---> [Rating]  (destinationId, CASCADE)
+\end{lstlisting}
+
+\section{Table Definitions}
+
+\begin{table}[H]
+  \centering
+  \caption{users table}
+  \begin{tabular}{llll}
+    \toprule
+    Column & Type & Constraints & Description \\
+    \midrule
+    id             & INT  & PK, AUTO\_INCREMENT & Unique identifier \\
+    name           & VARCHAR(255) & NOT NULL & Display name \\
+    email          & VARCHAR(255) & NOT NULL, UNIQUE & Login email \\
+    password       & VARCHAR(255) & NOT NULL & bcrypt hash \\
+    profilePicture & VARCHAR(255) & NULL & Upload file path \\
+    isAdmin        & BOOLEAN & DEFAULT false & Admin flag \\
+    createdAt      & DATETIME & & Auto-managed \\
+    updatedAt      & DATETIME & & Auto-managed \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{districts table}
+  \begin{tabular}{llll}
+    \toprule
+    Column & Type & Constraints & Description \\
+    \midrule
+    id             & INT & PK, AUTO\_INCREMENT & \\
+    name           & VARCHAR(255) & NOT NULL, UNIQUE & District name \\
+    description    & TEXT & & \\
+    mapCoordinates & JSON & & Lat/lng bounds \\
+    imageUrl       & VARCHAR(255) & & \\
+    province       & VARCHAR(255) & & Province name \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{destinations table}
+  \begin{tabular}{llll}
+    \toprule
+    Column & Type & Constraints & Description \\
+    \midrule
+    id              & INT & PK & \\
+    title           & VARCHAR(255) & NOT NULL & \\
+    description     & TEXT & NOT NULL & \\
+    images          & JSON & & Array of paths \\
+    location        & JSON & & \{lat, lng\} \\
+    bestTimeToVisit & VARCHAR(255) & & \\
+    travelTips      & TEXT & & \\
+    districtId      & INT & FK districts & \\
+    authorId        & INT & FK users & \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Data Seeding}
+
+The server directory contains several database utility scripts:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{createDatabase.js} — Creates the \texttt{tour\_blog} schema if it does not exist.
+  \item \textbf{setupNewDatabase.js} — Runs schema synchronisation (\texttt{sequelize.sync()}).
+  \item \textbf{seed.js / seedNewDatabase.js} — Populates the database with sample districts, destinations, and travel guides for demonstration purposes.
+  \item \textbf{testConnection.js / mysqlCheck.js} — Utility scripts to verify that the application can reach the database before deployment.
+\end{itemize}
+
+% ═══════════════════════════════════════════════
+% CHAPTER 5 — DOCKER AND DOCKER COMPOSE
+% ═══════════════════════════════════════════════
+\chapter{Docker and Containerisation}
+
+\section{Overview}
+
+The entire application stack is containerised using \textbf{Docker}, enabling consistent behaviour across development, CI/CD, and production environments. All services are orchestrated locally using \textbf{Docker Compose}.
+
+\section{docker-compose.yml}
+
+The Compose file defines three services:
+
+\begin{lstlisting}[caption={docker-compose.yml services}]
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: tour_blog
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+    ports: ["3306:3306"]
+    volumes: [mysql_data:/var/lib/mysql]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      interval: 30s
+      retries: 3
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile_backend
+    ports: ["5000:5000"]
+    environment:
+      DB_HOST: mysql
+      DB_USER: admin
+      DB_PASSWORD: password
+      JWT_SECRET: dev-secret
+    depends_on:
+      mysql: { condition: service_healthy }
+    volumes: [./server/uploads:/app/uploads]
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile_frontend
+      args:
+        VITE_API_URL: http://localhost:5000/api
+    ports: ["80:80"]
+    depends_on: [backend]
+\end{lstlisting}
+
+\textbf{Key points:}
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Health checks} — MySQL reports \texttt{healthy} only after accepting connections; the backend container waits for this (\texttt{condition: service\_healthy}) to avoid startup race conditions.
+  \item \textbf{Named volume} (\texttt{mysql\_data}) — Persists MySQL data across container restarts so database contents survive \texttt{docker compose down}.
+  \item \textbf{Uploads volume} — Mounts \texttt{./server/uploads} into the backend container so uploaded files persist and are accessible on the host.
+  \item \textbf{Service networking} — Docker Compose creates a default bridge network; the backend connects to MySQL using the service name \texttt{mysql} as the hostname.
+\end{itemize}
+
+\section{.dockerignore}
+
+The \texttt{.dockerignore} file excludes unnecessary files from the Docker build context (e.g.\ \texttt{node\_modules}, \texttt{.git}, \texttt{dist}) to speed up image builds and reduce image sizes.
+
+% ═══════════════════════════════════════════════
+% CHAPTER 6 — CI/CD PIPELINE (Jenkinsfile)
+% ═══════════════════════════════════════════════
+\chapter{CI/CD Pipeline (Jenkinsfile)}
+
+\section{Overview}
+
+The Jenkins Declarative Pipeline automates the end-to-end build-and-deploy workflow. Every push to the repository triggers the pipeline, which:
+
+\begin{enumerate}[leftmargin=2em]
+  \item Prepares the build environment.
+  \item Builds Docker images for both backend and frontend.
+  \item Pushes images to \textbf{Docker Hub} (under the \texttt{upeka2002} account).
+  \item Installs Terraform if not already present.
+  \item Runs Terraform to apply any infrastructure changes on AWS.
+\end{enumerate}
+
+\section{Environment Variables}
+
+\begin{lstlisting}[language=bash, caption={Jenkinsfile environment block}]
+environment {
+  DOCKERHUB_REPO   = "upeka2002"
+  BACKEND_IMAGE    = "upeka2002/tourblog-backend"
+  FRONTEND_IMAGE   = "upeka2002/tourblog-frontend"
+  TF_VERSION       = "1.7.0"
+}
+\end{lstlisting}
+
+\section{Pipeline Stages Explained}
+
+\subsection{Stage 1: Prepare}
+
+Checks out the latest source code and generates a short \textbf{Git commit SHA} to use as the Docker image tag. Using the commit SHA (instead of \texttt{latest}) ensures every image is traceable to the exact code version:
+
+\begin{lstlisting}[language=bash, caption={Prepare stage}]
+stage('Prepare') {
+  steps {
+    checkout scm
+    script {
+      IMAGE_TAG = sh(returnStdout: true,
+                     script: 'git rev-parse --short HEAD').trim()
+      echo "Building image tag: ${IMAGE_TAG}"
+    }
+  }
+}
+\end{lstlisting}
+
+\subsection{Stage 2: Build Backend}
+
+Builds the backend Docker image from \texttt{./server/Dockerfile\_backend}, tagging it with both the commit SHA and \texttt{latest}:
+
+\begin{lstlisting}[language=bash, caption={Build Backend stage}]
+stage('Build Backend') {
+  steps {
+    dir('server') {
+      sh """
+        docker build -f Dockerfile_backend \
+          -t ${BACKEND_IMAGE}:${IMAGE_TAG} \
+          -t ${BACKEND_IMAGE}:latest .
+      """
+    }
+  }
+}
+\end{lstlisting}
+
+\subsection{Stage 3: Build Frontend}
+
+Builds the frontend Docker image. The \textbf{AWS EC2 public IP} is injected as a build argument so Vite embeds the correct API URL into the compiled JavaScript bundle:
+
+\begin{lstlisting}[language=bash, caption={Build Frontend stage}]
+stage('Build Frontend') {
+  steps {
+    dir('client') {
+      sh """
+        docker build \
+          --build-arg VITE_API_URL=http://<EC2_PUBLIC_IP>:5000/api \
+          -f Dockerfile_frontend \
+          -t ${FRONTEND_IMAGE}:${IMAGE_TAG} \
+          -t ${FRONTEND_IMAGE}:latest .
+      """
+    }
+  }
+}
+\end{lstlisting}
+
+\subsection{Stage 4: Push to Docker Hub}
+
+Authenticates with Docker Hub using Jenkins credentials and pushes both tagged images:
+
+\begin{lstlisting}[language=bash, caption={Push to Docker Hub stage}]
+stage('Push to Docker Hub') {
+  steps {
+    withCredentials([usernamePassword(
+      credentialsId: 'dockerhub-credentials',
+      usernameVariable: 'DOCKER_USER',
+      passwordVariable: 'DOCKER_PASS'
+    )]) {
+      sh """
+        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+        docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
+        docker push ${BACKEND_IMAGE}:latest
+        docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
+        docker push ${FRONTEND_IMAGE}:latest
+        docker logout
+      """
+    }
+  }
+}
+\end{lstlisting}
+
+\textbf{Security note:} The password is never echoed; \texttt{--password-stdin} reads it from stdin.
+
+\subsection{Stage 5: Install Terraform}
+
+Checks if Terraform is installed; if not, downloads version 1.7.0 from the official HashiCorp releases:
+
+\begin{lstlisting}[language=bash, caption={Install Terraform stage}]
+stage('Install Terraform') {
+  steps {
+    sh """
+      if ! command -v terraform &>/dev/null; then
+        wget https://releases.hashicorp.com/terraform/${TF_VERSION}/
+              terraform_${TF_VERSION}_linux_amd64.zip
+        unzip terraform_${TF_VERSION}_linux_amd64.zip
+        mv terraform /usr/local/bin/
+      fi
+      terraform version
+    """
+  }
+}
+\end{lstlisting}
+
+\subsection{Stages 6--9: Terraform Init, State Cleanup, Plan, Apply}
+
+These stages use the AWS credentials stored in Jenkins (\texttt{aws-access-key-id} and \texttt{aws-secret-access-key}) to authenticate with AWS and apply infrastructure changes:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Terraform Init} — Downloads the AWS provider plugin and initialises the working directory.
+  \item \textbf{State Cleanup} — Removes stale resource entries from the Terraform state file to avoid errors with pre-existing resources.
+  \item \textbf{Terraform Plan} — Generates an execution plan (\texttt{tfplan}) showing exactly what changes will be made to AWS.
+  \item \textbf{Terraform Apply} — Applies the plan automatically (\texttt{-auto-approve}), updating S3 bucket configuration.
+\end{itemize}
+
+% ═══════════════════════════════════════════════
+% CHAPTER 7 — INFRASTRUCTURE AS CODE (Terraform.tf)
+% ═══════════════════════════════════════════════
+\chapter{Infrastructure as Code (Terraform.tf)}
+
+\section{Overview}
+
+\texttt{Terraform.tf} defines and manages the \textbf{AWS cloud infrastructure} required to run the Tour Blog platform in production. It uses the \textbf{HashiCorp Configuration Language (HCL)} and the \texttt{hashicorp/aws} provider (\textasciitilde 5.0).
+
+A key design decision is that Terraform \textbf{references existing AWS resources} (by their IDs) rather than creating them from scratch. This prevents accidental destruction of live infrastructure while still allowing Terraform to manage configuration (e.g.\ S3 policies).
+
+\section{Provider Configuration}
+
+\begin{lstlisting}[caption={Provider block}]
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region  # Default: us-east-1
+}
+\end{lstlisting}
+
+The AWS credentials are supplied at runtime via environment variables (\texttt{AWS\_ACCESS\_KEY\_ID} and \texttt{AWS\_SECRET\_ACCESS\_KEY}) injected by Jenkins, keeping secrets out of the repository.
+
+\section{Referenced Existing Resources}
+
+The following resources are referenced using \texttt{data} sources but \textbf{not} managed (not created or destroyed) by Terraform:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{EC2 instance} (\texttt{<EC2_INSTANCE_ID>}) — Ubuntu 22.04 LTS \texttt{t3.micro} instance running the Docker containers.
+  \item \textbf{Security group (EC2)} (\texttt{<EC2_SECURITY_GROUP_ID>}) — \texttt{tour-blog-backend-sg} controlling inbound/outbound traffic.
+  \item \textbf{Security group (RDS)} (\texttt{<RDS_SECURITY_GROUP_ID>}) — Default VPC security group for the RDS instance.
+  \item \textbf{RDS MySQL instance} (\texttt{tour-blog-db}) — MySQL 8.0.40, \texttt{db.t3.micro}, 20\,GB storage.
+  \item \textbf{S3 buckets} — \texttt{tour-blog-frontend-<ACCOUNT_ID>} and \texttt{tour-blog-deploy-<ACCOUNT_ID>}.
+\end{itemize}
+
+\section{Managed Resources}
+
+Terraform actively manages three S3 resources:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{S3 Website Configuration} — Configures the frontend bucket as a static website with \texttt{index.html} as both index and error document, enabling React Router to serve all routes.
+  \item \textbf{S3 Public Access Block} — Disables all four AWS public-access blocks on the frontend bucket, allowing the bucket policy to grant public read access.
+  \item \textbf{S3 Bucket Policy} — Attaches an IAM policy granting \texttt{s3:GetObject} to all principals (\texttt{"*"}) on all objects in the bucket, making static assets publicly readable.
+\end{enumerate}
+
+\section{Input Variables}
+
+\begin{table}[H]
+  \centering
+  \caption{Terraform input variables}
+  \begin{tabular}{lllc}
+    \toprule
+    \textbf{Variable} & \textbf{Type} & \textbf{Default} & \textbf{Sensitive} \\
+    \midrule
+    aws\_region          & string & us-east-1        & No \\
+    project\_name        & string & tour-blog        & No \\
+    ec2\_ami\_id         & string & <AMI_ID> & No \\
+    ec2\_instance\_type  & string & t3.micro         & No \\
+    ssh\_public\_key     & string & (empty)          & Yes \\
+    db\_engine\_version  & string & 8.0.40           & No \\
+    db\_instance\_class  & string & db.t3.micro      & No \\
+    db\_allocated\_storage & number & 20             & No \\
+    db\_name             & string & tour\_blog       & No \\
+    db\_username         & string & admin            & Yes \\
+    db\_password         & string & (empty)          & Yes \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Outputs}
+
+After a \texttt{terraform apply}, the following values are printed, allowing other tools (e.g.\ the Jenkins deploy stage) to discover the infrastructure endpoints dynamically:
+
+\begin{table}[H]
+  \centering
+  \caption{Terraform outputs}
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Output} & \textbf{Value} \\
+    \midrule
+    ec2\_public\_ip    & Public IP of the backend server \\
+    ec2\_instance\_id  & AWS instance ID \\
+    ec2\_ssh\_command  & Ready-to-use SSH command \\
+    rds\_endpoint     & Full RDS connection string (host:port) \\
+    rds\_address      & RDS hostname only \\
+    database\_name    & \texttt{tour\_blog} \\
+    backend\_api\_url & \texttt{http://\{ec2\_ip\}:5000/api} \\
+    s3\_frontend\_url & S3 static website URL \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{user-data-inline.sh --- EC2 Bootstrap Script}
+
+This Bash script is executed once when the EC2 instance first launches (via AWS User Data). It automates the entire server setup:
+
+\begin{enumerate}[leftmargin=2em]
+  \item System update (\texttt{apt-get update \&\& upgrade})
+  \item Install Node.js 20.x from NodeSource
+  \item Install PM2 globally (\texttt{npm install -g pm2}) --- process manager
+  \item Install MySQL client, Git, unzip
+  \item Download and install AWS CLI v2
+  \item Create \texttt{/app} directory with correct permissions
+  \item Generate \texttt{.env} template for the backend
+  \item Create a deployment shell script that pulls Docker images and restarts containers
+\end{enumerate}
+
+\section{cleanup-terraform-state.sh}
+
+A utility script for Terraform state management. It removes stale resource references from the local Terraform state file (\texttt{terraform.tfstate}), preventing ``resource already exists'' errors when Terraform tries to manage resources that were created outside of Terraform. This is particularly useful during initial setup or after manual AWS console changes.
+
+% ═══════════════════════════════════════════════
+% CHAPTER 8 — AUTHENTICATION AND SECURITY
+% ═══════════════════════════════════════════════
+\chapter{Authentication and Security}
+
+\section{Authentication Flow}
+
+The application uses \textbf{stateless JWT (JSON Web Token) authentication}:
+
+\begin{enumerate}[leftmargin=2em]
+  \item User submits email and password via \texttt{POST /api/users/login}.
+  \item Backend finds the user by email, calls \texttt{user.matchPassword(plaintext)} which calls \texttt{bcryptjs.compare()}.
+  \item If the password matches, the server calls \texttt{jwt.sign(\{ id, name, email \}, JWT\_SECRET, \{ expiresIn: '30d' \})} to produce a signed token.
+  \item The token is returned to the frontend in the response body.
+  \item The frontend stores the token in \texttt{localStorage} and includes it as \texttt{Authorization: Bearer <token>} on every subsequent request.
+  \item The \texttt{authMiddleware} verifies the token signature on protected routes.
+\end{enumerate}
+
+\section{Password Security}
+
+Passwords are hashed using \textbf{bcryptjs} with a cost factor (salt rounds) of \textbf{10}. This means:
+\begin{itemize}[leftmargin=2em]
+  \item Plain-text passwords are \textbf{never stored} in the database.
+  \item Each password hash is unique due to random salt, preventing rainbow table attacks.
+  \item The cost factor of 10 means \textasciitilde 1024 hash iterations, making brute-force attacks computationally expensive.
+\end{itemize}
+
+\section{Security Headers (Nginx)}
+
+The Nginx configuration adds HTTP security headers to all frontend responses:
+
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{X-Frame-Options: SAMEORIGIN} --- Prevents clickjacking by blocking the page from being embedded in iframes on other domains.
+  \item \texttt{X-Content-Type-Options: nosniff} --- Prevents MIME-type sniffing attacks.
+  \item \texttt{X-XSS-Protection: 1; mode=block} --- Enables the browser's built-in XSS filter.
+\end{itemize}
+
+\section{Security Considerations and Recommendations}
+
+\begin{table}[H]
+  \centering
+  \caption{Security assessment}
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Area} & \textbf{Status} & \textbf{Notes} \\
+    \midrule
+    Password hashing    & Implemented & bcryptjs, 10 rounds \\
+    JWT authentication  & Implemented & 30-day expiry \\
+    CORS               & Partially   & All origins allowed (tighten for production) \\
+    HTTPS              & Not shown   & Recommend AWS CloudFront + ACM \\
+    Rate limiting       & Missing     & Recommend express-rate-limit \\
+    Input validation    & Basic       & Add express-validator \\
+    SQL injection       & Protected   & Sequelize ORM parameterises queries \\
+    XSS (frontend)      & Partial     & React escapes JSX; add CSP header \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ═══════════════════════════════════════════════
+% CHAPTER 9 — DEPLOYMENT WORKFLOW
+% ═══════════════════════════════════════════════
+\chapter{Deployment Workflow}
+
+\section{End-to-End Deployment Sequence}
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Developer} pushes code to the GitHub repository.
+  \item \textbf{GitHub Webhook} triggers the Jenkins pipeline.
+  \item \textbf{Jenkins (Stage: Prepare)} checks out code, computes commit SHA for image tagging.
+  \item \textbf{Jenkins (Stage: Build Backend)} builds \texttt{upeka2002/tourblog-backend:\{sha\}}.
+  \item \textbf{Jenkins (Stage: Build Frontend)} builds \texttt{upeka2002/tourblog-frontend:\{sha\}} with the EC2 IP embedded.
+  \item \textbf{Jenkins (Stage: Push)} authenticates with Docker Hub and pushes both images.
+  \item \textbf{Jenkins (Stage: Terraform Apply)} updates S3 bucket configuration.
+  \item \textbf{Deploy script on EC2} pulls the new \texttt{latest} images and restarts Docker containers.
+  \item \textbf{Health check} confirms the backend API is responding.
+\end{enumerate}
+
+\section{Local Development}
+
+\begin{lstlisting}[language=bash, caption={Starting the application locally}]
+# Clone the repository
+git clone https://github.com/UpekaFernando/tour_blog_info_final.git
+cd tour_blog_info_final
+
+# Start all services (MySQL + backend + frontend)
+docker compose up -d --build
+
+# View backend logs
+docker compose logs -f backend
+
+# Stop all services
+docker compose down
+\end{lstlisting}
+
+After \texttt{docker compose up}, the application is accessible at:
+\begin{itemize}[leftmargin=2em]
+  \item Frontend: \texttt{http://localhost:80}
+  \item Backend API: \texttt{http://localhost:5000/api}
+\end{itemize}
+
+\section{Environment Variables Reference}
+
+\begin{table}[H]
+  \centering
+  \caption{Required environment variables}
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Variable} & \textbf{Service} & \textbf{Description} \\
+    \midrule
+    DB\_HOST         & Backend & MySQL hostname \\
+    DB\_USER         & Backend & MySQL username \\
+    DB\_PASSWORD     & Backend & MySQL password \\
+    DB\_NAME         & Backend & Database name (\texttt{tour\_blog}) \\
+    DB\_PORT         & Backend & MySQL port (default 3306) \\
+    JWT\_SECRET      & Backend & Secret for signing JWT tokens \\
+    NODE\_ENV        & Backend & \texttt{development} or \texttt{production} \\
+    PORT             & Backend & Server port (default 5000) \\
+    VITE\_API\_URL   & Frontend (build) & Backend API base URL \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ═══════════════════════════════════════════════
+% CHAPTER 10 — SUMMARY
+% ═══════════════════════════════════════════════
+\chapter{Summary and Conclusions}
+
+\section{What Has Been Built}
+
+The Tour Blog platform is a \textbf{production-ready, cloud-deployed full-stack web application} covering the complete spectrum of modern software engineering:
+
+\begin{itemize}[leftmargin=2em]
+  \item A \textbf{React SPA} with Material Design UI, client-side routing, interactive mapping, and responsive layout.
+  \item A \textbf{Node.js/Express REST API} with MVC architecture, JWT authentication, file uploads, and comprehensive CRUD endpoints for 6 domain entities.
+  \item A \textbf{MySQL relational database} with 7 interconnected tables managed by the Sequelize ORM.
+  \item \textbf{Docker containerisation} for consistent environments and simplified deployment.
+  \item A \textbf{Jenkins CI/CD pipeline} that automates the entire build $\rightarrow$ push $\rightarrow$ deploy cycle.
+  \item \textbf{Terraform infrastructure-as-code} managing AWS resources (EC2, RDS, S3).
+\end{itemize}
+
+\section{Key Design Decisions}
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Separation of concerns} — Frontend and backend are completely independent services communicating only via HTTP API, enabling independent scaling and deployment.
+  \item \textbf{Environment-based configuration} — All sensitive values (passwords, secrets, API keys) are injected via environment variables, never hard-coded.
+  \item \textbf{Stateless authentication} — JWT tokens allow horizontal scaling of the backend without shared session storage.
+  \item \textbf{Terraform data sources} — Referencing existing AWS resources (rather than recreating them) protects production data from accidental destruction.
+  \item \textbf{Docker multi-stage builds} — Keeps production images small and secure by excluding development tooling.
+\end{enumerate}
+
+\section{Future Improvements}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{HTTPS} — Configure AWS CloudFront with an ACM certificate in front of both the EC2 instance and S3 bucket.
+  \item \textbf{CORS hardening} — Restrict allowed origins to the specific frontend domain.
+  \item \textbf{Rate limiting} — Add \texttt{express-rate-limit} to prevent API abuse.
+  \item \textbf{Image storage} — Move uploaded images from local disk to AWS S3 for durability and scalability.
+  \item \textbf{Testing} — Add unit tests (Jest) for controllers and integration tests (Supertest) for API endpoints.
+  \item \textbf{Monitoring} — Integrate AWS CloudWatch metrics and alerts.
+  \item \textbf{Database migrations} — Use Sequelize migrations (instead of \texttt{sync()}) for controlled schema changes in production.
+\end{itemize}
+
+\end{document}
